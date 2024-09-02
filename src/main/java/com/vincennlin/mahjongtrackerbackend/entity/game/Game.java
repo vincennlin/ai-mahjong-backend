@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.constant.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,10 @@ public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private GameStatus status;
 
     @OneToMany(mappedBy = "game")
     private List<Round> rounds;
