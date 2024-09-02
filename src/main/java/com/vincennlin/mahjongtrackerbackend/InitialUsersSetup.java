@@ -1,12 +1,12 @@
 package com.vincennlin.mahjongtrackerbackend;
 
-import com.vincennlin.mahjongtrackerbackend.constant.Roles;
+import com.vincennlin.mahjongtrackerbackend.constant.user.Roles;
 import com.vincennlin.mahjongtrackerbackend.entity.user.Authority;
 import com.vincennlin.mahjongtrackerbackend.entity.user.Role;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
-import com.vincennlin.mahjongtrackerbackend.repository.AuthorityRepository;
-import com.vincennlin.mahjongtrackerbackend.repository.RoleRepository;
-import com.vincennlin.mahjongtrackerbackend.repository.UserRepository;
+import com.vincennlin.mahjongtrackerbackend.repository.user.AuthorityRepository;
+import com.vincennlin.mahjongtrackerbackend.repository.user.RoleRepository;
+import com.vincennlin.mahjongtrackerbackend.repository.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
