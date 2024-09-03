@@ -51,7 +51,7 @@ public class Game {
 
     @ManyToOne
     @JoinColumn(name = "east_player_id", referencedColumnName = "id")
-    private Player eastPlayer;
+    private GamePlayer eastPlayer;
 
     @OneToMany(mappedBy = "game")
     private List<Round> rounds;

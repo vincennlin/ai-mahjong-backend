@@ -28,15 +28,15 @@ public class GamePlayer {
 
     @OneToOne
     @JoinColumn(name = "upwind_player_id", referencedColumnName = "id")
-    private Player upwindPlayer;
+    private GamePlayer upwindPlayer;
 
     @OneToOne
     @JoinColumn(name = "opposite_player_id", referencedColumnName = "id")
-    private Player oppositePlayer;
+    private GamePlayer oppositePlayer;
 
     @OneToOne
     @JoinColumn(name = "downwind_player_id", referencedColumnName = "id")
-    private Player downwindPlayer;
+    private GamePlayer downwindPlayer;
 
 //    @Column(name = "score")
 //    private int score;

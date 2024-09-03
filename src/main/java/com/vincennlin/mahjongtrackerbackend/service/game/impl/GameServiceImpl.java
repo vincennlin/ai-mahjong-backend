@@ -1,9 +1,11 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
-import com.vincennlin.mahjongtrackerbackend.constant.game.gamestatus.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
+import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
+import com.vincennlin.mahjongtrackerbackend.exception.GameProcessException;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceOwnershipException;
 import com.vincennlin.mahjongtrackerbackend.exception.WebAPIException;
@@ -11,7 +13,6 @@ import com.vincennlin.mahjongtrackerbackend.mapper.game.GameMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
-import com.vincennlin.mahjongtrackerbackend.repository.game.GamePlayerRepository;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GameRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
@@ -130,7 +132,7 @@ public class GameServiceImpl implements GameService {
 
         addPlayerToGame(game, player);
 
-        if (game.getGamePlayers().size() == 4) {
+        if (game.getGamePlayers().size() == DefaultGameConstants.DEFAULT_PLAYER_COUNT) {
             game.setStatus(GameStatus.READY_TO_START);
         }
 
@@ -158,6 +160,39 @@ public class GameServiceImpl implements GameService {
         if (game.getGamePlayers().size() < 4) {
             game.setStatus(GameStatus.WAITING_FOR_PLAYERS);
         }
+
+        Game savedGame = gameRepository.save(game);
+
+        return gameMapper.mapToDto(savedGame);
+    }
+
+    @Override
+    public GameDto pickSeats(Long gameId) {
+
+        Game game = getGameEntityById(gameId);
+
+        if (!game.getCreator().getId().equals(authService.getCurrentUserId())) {
+            throw new GameProcessException(HttpStatus.FORBIDDEN, game.getStatus(), "Only game creator can start picking seats");
+        }
+
+        if (game.getStatus() != GameStatus.READY_TO_START) {
+            throw new GameProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in ready state");
+        }
+
+        List<GamePlayer> gamePlayerList = game.getGamePlayers();
+        Collections.shuffle(gamePlayerList);
+
+        int playerCount = gamePlayerList.size();
+        for (int i = 0; i < playerCount; i++) {
+            GamePlayer gamePlayer = gamePlayerList.get(i);
+            gamePlayer.setDownwindPlayer(gamePlayerList.get((i + 1) % playerCount));
+            gamePlayer.setOppositePlayer(gamePlayerList.get((i + 2) % playerCount));
+            gamePlayer.setUpwindPlayer(gamePlayerList.get((i + 3) % playerCount));
+        }
+
+        game.setEastPlayer(gamePlayerList.get(0));
+
+        game.setStatus(GameStatus.FINISHED_PICKING_SEATS);
 
         Game savedGame = gameRepository.save(game);
 

@@ -4,6 +4,8 @@ import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
+import com.vincennlin.mahjongtrackerbackend.mapper.game.GamePlayerMapper;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GamePlayerDto;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GamePlayerRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class GamePlayerServiceImpl implements GamePlayerService {
 
     private final GamePlayerRepository gamePlayerRepository;
+
+    private final GamePlayerMapper gamePlayerMapper;
+
+    @Override
+    public GamePlayerDto getGamePlayerByGameIdAndPlayerId(Long gameId, Long playerId) {
+
+        GamePlayer gamePlayer = gamePlayerRepository.getGamePlayerByGameIdAndPlayerId(gameId, playerId).orElseThrow(
+                () -> new ResourceNotFoundException("GamePlayer", "game id and player id", gameId));
+
+        return gamePlayerMapper.mapToDto(gamePlayer);
+    }
 
     @Override
     public GamePlayer getGamePlayerEntityByPlayerId(Long playerId) {

@@ -88,6 +88,14 @@ public class GameController {
         return new ResponseEntity<>(gameDto, HttpStatus.OK);
     }
 
+    @PutMapping("/games/{game_id}/pick-seats")
+    public ResponseEntity<GameDto> pickSeats(@PathVariable(name = "game_id") Long gameId) {
+
+        GameDto gameDto = gameService.pickSeats(gameId);
+
+        return new ResponseEntity<>(gameDto, HttpStatus.OK);
+    }
+
     private Pageable getPageable(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         return PageRequest.of(pageNo, pageSize,
                 sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());

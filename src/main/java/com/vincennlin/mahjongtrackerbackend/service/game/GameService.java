@@ -23,4 +23,6 @@ public interface GameService {
     GameDto addPlayerToGame(Long gameId, Long playerId);
 
     GameDto removePlayerFromGame(Long gameId, Long playerId);
+
+    GameDto pickSeats(Long gameId);
 }

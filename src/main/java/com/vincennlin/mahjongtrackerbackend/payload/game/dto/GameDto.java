@@ -1,6 +1,8 @@
 package com.vincennlin.mahjongtrackerbackend.payload.game.dto;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.user.UserDto;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class GameDto {
 
     @JsonProperty(value = "id")
