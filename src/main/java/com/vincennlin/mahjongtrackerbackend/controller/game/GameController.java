@@ -37,6 +37,14 @@ public class GameController {
         return new ResponseEntity<>(gamePageResponse, HttpStatus.OK);
     }
 
+    @GetMapping("/games/{game_id}")
+    public ResponseEntity<GameDto> getGameById(@PathVariable(name = "game_id") Long gameId) {
+
+        GameDto gameDto = gameService.getGameById(gameId);
+
+        return new ResponseEntity<>(gameDto, HttpStatus.OK);
+    }
+
     @PostMapping("/games")
     public ResponseEntity<GameDto> createGame(@Valid @RequestBody CreateGameRequest request) {
 

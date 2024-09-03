@@ -1,6 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.repository.game;
 
-import com.vincennlin.mahjongtrackerbackend.constant.game.playertype.PlayerType;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

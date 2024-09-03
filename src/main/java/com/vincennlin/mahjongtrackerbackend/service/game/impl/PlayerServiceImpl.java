@@ -1,6 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
-import com.vincennlin.mahjongtrackerbackend.constant.game.playertype.PlayerType;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;

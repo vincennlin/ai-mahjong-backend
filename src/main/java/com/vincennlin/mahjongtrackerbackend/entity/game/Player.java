@@ -1,6 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
-import com.vincennlin.mahjongtrackerbackend.constant.game.playertype.PlayerType;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

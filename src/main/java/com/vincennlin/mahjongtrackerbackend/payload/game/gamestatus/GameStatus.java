@@ -1,4 +1,4 @@
-package com.vincennlin.mahjongtrackerbackend.constant.game.gamestatus;
+package com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus;
 
 public enum GameStatus implements AbstractGameStatus{
     WAITING_FOR_PLAYERS,
