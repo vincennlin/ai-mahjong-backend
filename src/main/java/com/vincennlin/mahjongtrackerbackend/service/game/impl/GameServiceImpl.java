@@ -1,11 +1,9 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
-import com.vincennlin.mahjongtrackerbackend.constant.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
-import com.vincennlin.mahjongtrackerbackend.entity.user.User;
-import com.vincennlin.mahjongtrackerbackend.mapper.GameMapper;
-import com.vincennlin.mahjongtrackerbackend.payload.game.CreateGameRequest;
-import com.vincennlin.mahjongtrackerbackend.payload.game.GameDto;
+import com.vincennlin.mahjongtrackerbackend.mapper.game.GameMapper;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GameRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
 import com.vincennlin.mahjongtrackerbackend.service.user.AuthService;

@@ -1,7 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.controller.game;
 
-import com.vincennlin.mahjongtrackerbackend.payload.game.CreateGameRequest;
-import com.vincennlin.mahjongtrackerbackend.payload.game.GameDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

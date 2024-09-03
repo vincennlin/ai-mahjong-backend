@@ -1,8 +1,8 @@
-package com.vincennlin.mahjongtrackerbackend.mapper;
+package com.vincennlin.mahjongtrackerbackend.mapper.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
-import com.vincennlin.mahjongtrackerbackend.payload.game.GameDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.user.UserDto;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

@@ -1,6 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
-import com.vincennlin.mahjongtrackerbackend.constant.gamestatus.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.constant.game.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.vincennlin.mahjongtrackerbackend.constant.wind;
+package com.vincennlin.mahjongtrackerbackend.constant.game.wind;
 
 import lombok.Getter;
 

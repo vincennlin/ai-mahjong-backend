@@ -1,4 +1,4 @@
-package com.vincennlin.mahjongtrackerbackend.payload.game;
+package com.vincennlin.mahjongtrackerbackend.payload.game.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

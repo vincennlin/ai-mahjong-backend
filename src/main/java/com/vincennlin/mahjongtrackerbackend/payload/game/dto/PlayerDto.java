@@ -1,7 +1,7 @@
-package com.vincennlin.mahjongtrackerbackend.payload.game;
+package com.vincennlin.mahjongtrackerbackend.payload.game.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vincennlin.mahjongtrackerbackend.constant.playertype.PlayerType;
+import com.vincennlin.mahjongtrackerbackend.constant.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.user.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
