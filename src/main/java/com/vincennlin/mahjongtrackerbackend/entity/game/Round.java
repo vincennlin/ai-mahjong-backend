@@ -23,7 +23,7 @@ public class Round {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "match")
+    @OneToMany(mappedBy = "round")
     private List<Hand> hands;
 
     @ManyToOne

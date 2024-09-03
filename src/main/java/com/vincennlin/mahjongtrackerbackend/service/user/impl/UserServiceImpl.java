@@ -77,12 +77,17 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(user, UserDto.class);
     }
 
+    @Override
+    public User getUserEntityByUserId(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new WebAPIException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+    }
+
     @PostAuthorize("returnObject.id == principal or hasAuthority('ADVANCED')")
     @Override
     public UserDto getUserByUserId(Long userId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new WebAPIException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+        User user = getUserEntityByUserId(userId);
 
         return modelMapper.map(user, UserDto.class);
     }

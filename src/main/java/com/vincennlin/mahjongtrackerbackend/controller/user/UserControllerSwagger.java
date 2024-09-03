@@ -1,4 +1,4 @@
-package com.vincennlin.mahjongtrackerbackend.controller;
+package com.vincennlin.mahjongtrackerbackend.controller.user;
 
 import com.vincennlin.mahjongtrackerbackend.payload.user.*;
 import io.swagger.v3.oas.annotations.Operation;

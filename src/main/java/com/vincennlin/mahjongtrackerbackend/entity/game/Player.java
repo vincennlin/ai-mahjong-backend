@@ -20,27 +20,11 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "player_type")
-    private PlayerType playerType;
-
-    @ManyToOne
-    @JoinColumn(name = "game_id", referencedColumnName = "id")
-    private Game game;
-
-    @ManyToOne
-    @JoinColumn(name = "upwind_player_id", referencedColumnName = "id")
-    private Player upwindPlayer;
-
-    @ManyToOne
-    @JoinColumn(name = "opposite_player_id", referencedColumnName = "id")
-    private Player oppositePlayer;
-
-    @ManyToOne
-    @JoinColumn(name = "downwind_player_id", referencedColumnName = "id")
-    private Player downwindPlayer;
+    @Column(name = "type")
+    private PlayerType type;
 }

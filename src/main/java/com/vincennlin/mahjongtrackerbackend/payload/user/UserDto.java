@@ -43,36 +43,4 @@ public class UserDto {
             example = "user"
     )
     private String username;
-
-    @Schema(
-            name = "email",
-            description = "用戶電子郵件",
-            example = "user@gmail.com"
-    )
-    @Email(message = "Invalid email format")
-    private String email;
-
-    @Schema(
-            name = "date_created",
-            description = "帳號建立日期",
-            example = "2021-08-01T00:00:00"
-    )
-    @JsonProperty(
-            value = "date_created",
-            access = JsonProperty.Access.READ_ONLY
-    )
-    @CreationTimestamp
-    private LocalDateTime dateCreated;
-
-    @Schema(
-            name = "last_updated",
-            description = "帳號最後更新日期",
-            example = "2021-08-01T00:00:00"
-    )
-    @JsonProperty(
-            value = "last_updated",
-            access = JsonProperty.Access.READ_ONLY
-    )
-    @UpdateTimestamp
-    private LocalDateTime lastUpdated;
 }

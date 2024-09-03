@@ -1,6 +1,10 @@
 package com.vincennlin.mahjongtrackerbackend.service.user;
 
+import com.vincennlin.mahjongtrackerbackend.entity.user.User;
+
 public interface AuthService {
+
+    User getCurrentUser();
 
     Long getCurrentUserId();
 

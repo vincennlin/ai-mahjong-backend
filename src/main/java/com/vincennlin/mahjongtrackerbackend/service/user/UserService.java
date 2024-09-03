@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.service.user;
 
+import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.payload.user.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -10,6 +11,8 @@ public interface UserService extends UserDetailsService {
     RegisterResponse register(RegisterDto registerDto);
 
     UserDto getUserDetailsByUsername(String username);
+
+    User getUserEntityByUserId(Long userId);
 
     UserDto getUserByUserId(Long userId);
 

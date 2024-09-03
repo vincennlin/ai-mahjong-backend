@@ -17,26 +17,38 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "matches")
+@Table(name = "games")
 public class Game {
+
+    public Game(User creator) {
+        this.status = GameStatus.WAITING_FOR_PLAYERS;
+        this.creator = creator;
+        this.basePoint = 3;
+        this.fannPoint = 1;
+        this.dollarPerPoint = 10;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    private User creator;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private GameStatus status;
 
     @OneToMany(mappedBy = "game")
-    private List<Round> rounds;
-
-    @OneToMany(mappedBy = "game")
-    private List<Player> players;
+    private List<GamePlayer> players;
 
     @ManyToOne
     @JoinColumn(name = "east_player_id", referencedColumnName = "id")
     private Player eastPlayer;
+
+    @OneToMany(mappedBy = "game")
+    private List<Round> rounds;
 
     @Column(name = "base_point")
     private int basePoint;
