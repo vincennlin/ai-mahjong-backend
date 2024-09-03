@@ -1,6 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
+import com.vincennlin.mahjongtrackerbackend.entity.game.Round;
 import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
@@ -13,6 +14,7 @@ import com.vincennlin.mahjongtrackerbackend.mapper.game.GameMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GameRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
@@ -139,6 +141,13 @@ public class GameServiceImpl implements GameService {
         return gameMapper.mapToDto(getGameEntityById(gameId));
     }
 
+    private void addPlayerToGame(Game game, Player player) {
+
+        GamePlayer newGamePlayer = gamePlayerService.createGamePlayerAndGetEntity(game, player);
+
+        game.getGamePlayers().add(newGamePlayer);
+    }
+
     @Transactional
     @Override
     public GameDto removePlayerFromGame(Long gameId, Long playerId) {
@@ -174,7 +183,6 @@ public class GameServiceImpl implements GameService {
         if (!game.getCreator().getId().equals(authService.getCurrentUserId())) {
             throw new GameProcessException(HttpStatus.FORBIDDEN, game.getStatus(), "Only game creator can start picking seats");
         }
-
         if (game.getStatus() != GameStatus.READY_TO_START) {
             throw new GameProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in ready state");
         }
@@ -199,11 +207,26 @@ public class GameServiceImpl implements GameService {
         return gameMapper.mapToDto(savedGame);
     }
 
-    private void addPlayerToGame(Game game, Player player) {
+    @Override
+    public GameDto decideEastPlayer(Long gameId) {
 
-        GamePlayer newGamePlayer = gamePlayerService.createGamePlayerAndGetEntity(game, player);
+        Game game = getGameEntityById(gameId);
 
-        game.getGamePlayers().add(newGamePlayer);
+        if (!game.getCreator().getId().equals(authService.getCurrentUserId())) {
+            throw new GameProcessException(HttpStatus.FORBIDDEN, game.getStatus(), "Only game creator can start picking seats");
+        }
+        if (game.getStatus() != GameStatus.FINISHED_PICKING_SEATS) {
+            throw new GameProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in finished picking seats state");
+        }
+
+        int randomIndex = (int) (Math.random() * 4);
+        game.setEastPlayer(game.getGamePlayers().get(randomIndex));
+
+        game.setStatus(GameStatus.FINISHED_DECIDING_EAST_PLAYER);
+
+        Game savedGame = gameRepository.save(game);
+
+        return gameMapper.mapToDto(savedGame);
     }
 
     private void authorizeOwnershipByGameCreatorId(Long gameCreatorId) {

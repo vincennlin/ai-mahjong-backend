@@ -1,6 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.payload.game.dto;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
@@ -12,6 +13,7 @@ import lombok.Setter;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,6 +29,9 @@ public class GameDto {
 
     @JsonProperty(value = "creator")
     private UserDto creator;
+
+    @JsonProperty(value = "east_player")
+    private GamePlayerDto eastPlayer;
 
     @JsonProperty(value = "game_players")
     private List<GamePlayerDto> gamePlayers;

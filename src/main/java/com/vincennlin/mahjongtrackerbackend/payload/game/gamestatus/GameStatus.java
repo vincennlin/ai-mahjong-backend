@@ -5,6 +5,7 @@ public enum GameStatus implements AbstractGameStatus{
     READY_TO_START,
     PICKING_SEATS,
     FINISHED_PICKING_SEATS,
+    FINISHED_DECIDING_EAST_PLAYER,
     IN_PROGRESS,
     FINISHED
 }

@@ -25,4 +25,6 @@ public interface GameService {
     GameDto removePlayerFromGame(Long gameId, Long playerId);
 
     GameDto pickSeats(Long gameId);
+
+    GameDto decideEastPlayer(Long gameId);
 }

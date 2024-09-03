@@ -19,6 +19,11 @@ import java.util.List;
 @Table(name = "rounds")
 public class Round {
 
+    public Round(Game game, Wind roundWind) {
+        this.game = game;
+        this.roundWind = roundWind;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
