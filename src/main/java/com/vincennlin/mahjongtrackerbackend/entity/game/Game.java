@@ -31,21 +31,12 @@ public class Game {
     @OneToMany(mappedBy = "game")
     private List<Round> rounds;
 
+    @OneToMany(mappedBy = "game")
+    private List<Player> players;
+
     @ManyToOne
     @JoinColumn(name = "east_player_id", referencedColumnName = "id")
-    private User eastPlayer;
-
-    @ManyToOne
-    @JoinColumn(name = "south_player_id", referencedColumnName = "id")
-    private User southPlayer;
-
-    @ManyToOne
-    @JoinColumn(name = "west_player_id", referencedColumnName = "id")
-    private User westPlayer;
-
-    @ManyToOne
-    @JoinColumn(name = "north_player_id", referencedColumnName = "id")
-    private User northPlayer;
+    private Player eastPlayer;
 
     @Column(name = "base_point")
     private int basePoint;
