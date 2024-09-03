@@ -1,8 +1,10 @@
 package com.vincennlin.mahjongtrackerbackend.mapper.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
+import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GamePlayerDto;
 import com.vincennlin.mahjongtrackerbackend.payload.user.UserDto;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -21,6 +23,24 @@ public class GameMapper {
         Converter<User, UserDto> userConverter = context ->
                 context.getSource() == null ? null : modelMapper.map(context.getSource(), UserDto.class);
         modelMapper.addConverter(userConverter);
+
+        Converter<GamePlayer, GamePlayerDto> gamePlayerConverter = context ->
+                context.getSource() == null ? null : modelMapper.map(context.getSource(), GamePlayerDto.class);
+        modelMapper.addConverter(gamePlayerConverter);
+
+//        Converter<GamePlayer, GamePlayerDto> gamePlayerConverter = context ->{
+//            GamePlayer source = context.getSource();
+//            if (source == null) {
+//                return null;
+//            }
+//            GamePlayerDto destination = new GamePlayerDto();
+//            destination.setId(source.getId());
+//            destination.setPlayerId(source.getPlayer().getId());
+//            destination.setGameId(source.getGame().getId());
+//            destination.setPlayerName(source.getPlayer().getPlayerName());
+//            return destination;
+//        };
+//        modelMapper.addConverter(gamePlayerConverter);
     }
 
     public GameDto mapToDto(Game game) {

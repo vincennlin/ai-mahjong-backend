@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -23,6 +24,7 @@ public class Game {
     public Game(User creator) {
         this.status = GameStatus.WAITING_FOR_PLAYERS;
         this.creator = creator;
+        this.gamePlayers = new ArrayList<>();
         this.basePoint = 3;
         this.fannPoint = 1;
         this.dollarPerPoint = 10;
@@ -40,8 +42,12 @@ public class Game {
     @Column(name = "status")
     private GameStatus status;
 
-    @OneToMany(mappedBy = "game")
-    private List<GamePlayer> players;
+    @OneToMany(
+            mappedBy = "game",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
+    private List<GamePlayer> gamePlayers;
 
     @ManyToOne
     @JoinColumn(name = "east_player_id", referencedColumnName = "id")

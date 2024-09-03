@@ -39,6 +39,26 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public Player getPlayerEntityById(Long playerId) {
+        return playerRepository.findById(playerId).orElseThrow(
+                () -> new ResourceNotFoundException("Player", "id", playerId));
+    }
+
+    @Override
+    public Player getCurrentPlayer() {
+
+        return playerRepository.findByUserIdAndType(
+                authService.getCurrentUserId(), PlayerType.HUMAN).orElseGet(() -> {
+                    Player player = new Player();
+                    player.setType(PlayerType.HUMAN);
+                    player.setUser(authService.getCurrentUser());
+                    player.setPlayerName(player.getUser().getUsername());
+                    return playerRepository.save(player);
+                }
+        );
+    }
+
+    @Override
     public PlayerDto createPlayer(CreatePlayerRequest request) {
 
         Player player = new Player();
@@ -52,8 +72,6 @@ public class PlayerServiceImpl implements PlayerService {
         } else {
             player.setPlayerName(getDefaultPlayerName(player));
         }
-
-        ;
 
 //        if (request.getType() == PlayerType.HUMAN && request.getUserId != authService.getCurrentUserId()) {
 //            throw new RuntimeException("Unauthorized");
@@ -117,11 +135,6 @@ public class PlayerServiceImpl implements PlayerService {
         if (!authService.getCurrentUser().getId().equals(userId)) {
             throw new RuntimeException("Unauthorized");
         }
-    }
-
-    private Player getPlayerEntityById(Long playerId) {
-        return playerRepository.findById(playerId).orElseThrow(
-                () -> new ResourceNotFoundException("Player", "id", playerId));
     }
 
     private PlayerPageResponse getPlayerPageResponse(Page<Player> pageOfPlayers) {
