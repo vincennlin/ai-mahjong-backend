@@ -1,7 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
-import com.vincennlin.mahjongtrackerbackend.entity.game.Round;
 import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
@@ -14,7 +13,6 @@ import com.vincennlin.mahjongtrackerbackend.mapper.game.GameMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GameRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
@@ -58,8 +56,13 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game getGameEntityById(Long gameId) {
-        return gameRepository.findById(gameId).orElseThrow(
+
+        Game game = gameRepository.findById(gameId).orElseThrow(
                 () -> new ResourceNotFoundException("Game", "id", gameId));
+
+        authorizeOwnershipByGameCreatorId(game.getCreator().getId());
+
+        return game;
     }
 
     @Transactional
@@ -104,6 +107,11 @@ public class GameServiceImpl implements GameService {
         Game updatedGame = gameRepository.save(game);
 
         return gameMapper.mapToDto(updatedGame);
+    }
+
+    @Override
+    public GameDto saveGame(Game game) {
+        return gameMapper.mapToDto(gameRepository.save(game));
     }
 
     @Transactional
@@ -180,9 +188,6 @@ public class GameServiceImpl implements GameService {
 
         Game game = getGameEntityById(gameId);
 
-        if (!game.getCreator().getId().equals(authService.getCurrentUserId())) {
-            throw new GameProcessException(HttpStatus.FORBIDDEN, game.getStatus(), "Only game creator can start picking seats");
-        }
         if (game.getStatus() != GameStatus.READY_TO_START) {
             throw new GameProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in ready state");
         }
@@ -212,9 +217,6 @@ public class GameServiceImpl implements GameService {
 
         Game game = getGameEntityById(gameId);
 
-        if (!game.getCreator().getId().equals(authService.getCurrentUserId())) {
-            throw new GameProcessException(HttpStatus.FORBIDDEN, game.getStatus(), "Only game creator can start picking seats");
-        }
         if (game.getStatus() != GameStatus.FINISHED_PICKING_SEATS) {
             throw new GameProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in finished picking seats state");
         }
@@ -222,7 +224,7 @@ public class GameServiceImpl implements GameService {
         int randomIndex = (int) (Math.random() * 4);
         game.setEastPlayer(game.getGamePlayers().get(randomIndex));
 
-        game.setStatus(GameStatus.FINISHED_DECIDING_EAST_PLAYER);
+        game.setStatus(GameStatus.READY_TO_START_NEW_ROUND);
 
         Game savedGame = gameRepository.save(game);
 

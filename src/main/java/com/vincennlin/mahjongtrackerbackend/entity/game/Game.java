@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.entity.game;
 
 import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
+import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class Game {
         this.basePoint = 3;
         this.fannPoint = 1;
         this.dollarPerPoint = 10;
+        this.rounds = new ArrayList<>();
     }
 
     @Id
@@ -76,5 +78,19 @@ public class Game {
             }
         }
         return false;
+    }
+
+    public Wind getNextRoundWind() {
+        if (rounds == null || rounds.isEmpty()) {
+            return Wind.EAST;
+        }
+        return rounds.get(rounds.size() - 1).getRoundWind().nextWind();
+    }
+
+    public Round getCurrentRound() {
+        if (rounds == null || rounds.isEmpty()) {
+            return null;
+        }
+        return rounds.get(rounds.size() - 1);
     }
 }

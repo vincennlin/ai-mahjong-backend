@@ -18,6 +18,8 @@ public interface GameService {
 
     GameDto updateGame(Long gameId, GameDto gameDto);
 
+    GameDto saveGame(Game game);
+
     void deleteGameById(Long gameId);
 
     GameDto addPlayerToGame(Long gameId, Long playerId);
