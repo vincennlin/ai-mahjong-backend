@@ -62,6 +62,24 @@ public class GameController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping("/games/{game_id}/players/{player_id}")
+    public ResponseEntity<GameDto> addPlayerToGame(@PathVariable(name = "game_id") Long gameId,
+                                                  @PathVariable(name = "player_id") Long playerId) {
+
+        GameDto gameDto = gameService.addPlayerToGame(gameId, playerId);
+
+        return new ResponseEntity<>(gameDto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/games/{game_id}/players/{player_id}")
+    public ResponseEntity<GameDto> removePlayerFromGame(@PathVariable(name = "game_id") Long gameId,
+                                                  @PathVariable(name = "player_id") Long playerId) {
+
+        GameDto gameDto = gameService.removePlayerFromGame(gameId, playerId);
+
+        return new ResponseEntity<>(gameDto, HttpStatus.OK);
+    }
+
     private Pageable getPageable(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         return PageRequest.of(pageNo, pageSize,
                 sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());

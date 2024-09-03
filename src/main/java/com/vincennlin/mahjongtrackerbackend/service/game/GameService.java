@@ -21,4 +21,6 @@ public interface GameService {
     void deleteGameById(Long gameId);
 
     GameDto addPlayerToGame(Long gameId, Long playerId);
+
+    GameDto removePlayerFromGame(Long gameId, Long playerId);
 }

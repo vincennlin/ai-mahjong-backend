@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -58,6 +59,7 @@ public class PlayerServiceImpl implements PlayerService {
         );
     }
 
+    @Transactional
     @Override
     public PlayerDto createPlayer(CreatePlayerRequest request) {
 
@@ -87,6 +89,7 @@ public class PlayerServiceImpl implements PlayerService {
         return playerMapper.mapToDto(newPlayer);
     }
 
+    @Transactional
     @Override
     public PlayerDto updatePlayer(Long playerId, PlayerDto playerDto) {
 
@@ -107,6 +110,7 @@ public class PlayerServiceImpl implements PlayerService {
         return playerMapper.mapToDto(updatedPlayer);
     }
 
+    @Transactional
     @Override
     public void deletePlayerById(Long playerId) {
 

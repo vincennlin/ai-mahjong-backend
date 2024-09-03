@@ -68,4 +68,13 @@ public class Game {
     @CreationTimestamp
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
+
+    public boolean containsPlayerById(Long playerId) {
+        for (GamePlayer gamePlayer : gamePlayers) {
+            if (gamePlayer.getPlayer().getId().equals(playerId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

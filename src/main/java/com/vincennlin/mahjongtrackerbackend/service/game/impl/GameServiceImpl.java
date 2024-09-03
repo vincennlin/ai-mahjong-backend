@@ -1,23 +1,28 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
+import com.vincennlin.mahjongtrackerbackend.constant.game.gamestatus.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceOwnershipException;
+import com.vincennlin.mahjongtrackerbackend.exception.WebAPIException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.GameMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GamePlayerRepository;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GameRepository;
+import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
 import com.vincennlin.mahjongtrackerbackend.service.game.PlayerService;
 import com.vincennlin.mahjongtrackerbackend.service.user.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,11 +32,11 @@ public class GameServiceImpl implements GameService {
 
     private final GameMapper gameMapper;
 
+    private final GamePlayerService gamePlayerService;
     private final PlayerService playerService;
     private final AuthService authService;
 
     private final GameRepository gameRepository;
-    private final GamePlayerRepository gamePlayerRepository;
 
     @Override
     public GamePageResponse getGames(Pageable pageable) {
@@ -53,6 +58,7 @@ public class GameServiceImpl implements GameService {
                 () -> new ResourceNotFoundException("Game", "id", gameId));
     }
 
+    @Transactional
     @Override
     public GameDto createGame(CreateGameRequest request) {
 
@@ -70,6 +76,8 @@ public class GameServiceImpl implements GameService {
             game.setDollarPerPoint(request.getDollarPerPoint());
         }
 
+        game = gameRepository.save(game);
+
         addPlayerToGame(game, currentPlayer);
 
         Game newGame = gameRepository.save(game);
@@ -77,6 +85,7 @@ public class GameServiceImpl implements GameService {
         return gameMapper.mapToDto(newGame);
     }
 
+    @Transactional
     @Override
     public GameDto updateGame(Long gameId, GameDto gameDto) {
 
@@ -93,6 +102,7 @@ public class GameServiceImpl implements GameService {
         return gameMapper.mapToDto(updatedGame);
     }
 
+    @Transactional
     @Override
     public void deleteGameById(Long gameId) {
 
@@ -103,25 +113,60 @@ public class GameServiceImpl implements GameService {
         gameRepository.deleteById(gameId);
     }
 
+    @Transactional
     @Override
     public GameDto addPlayerToGame(Long gameId, Long playerId) {
 
+        Game game = getGameEntityById(gameId);
+
+        if (game.getGamePlayers().size() >= 4) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Game is full, cannot add more players");
+        }
+        if (game.containsPlayerById(playerId)) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player is already in the game");
+        }
+
         Player player = playerService.getPlayerEntityById(playerId);
 
-        addPlayerToGame(getGameEntityById(gameId), player);
+        addPlayerToGame(game, player);
+
+        if (game.getGamePlayers().size() == 4) {
+            game.setStatus(GameStatus.READY_TO_START);
+        }
 
         return gameMapper.mapToDto(getGameEntityById(gameId));
     }
 
+    @Transactional
+    @Override
+    public GameDto removePlayerFromGame(Long gameId, Long playerId) {
+
+        Game game = getGameEntityById(gameId);
+
+        if (game.getGamePlayers().size() <= 1) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Game only has one player, cannot remove player");
+        }
+        if (!game.containsPlayerById(playerId)) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player is not in the game");
+        }
+
+        GamePlayer gamePlayer = gamePlayerService.getGamePlayerEntityByPlayerId(playerId);
+
+        game.getGamePlayers().remove(gamePlayer);
+        gamePlayerService.deleteGamePlayerById(gamePlayer.getId());
+
+        if (game.getGamePlayers().size() < 4) {
+            game.setStatus(GameStatus.WAITING_FOR_PLAYERS);
+        }
+
+        Game savedGame = gameRepository.save(game);
+
+        return gameMapper.mapToDto(savedGame);
+    }
+
     private void addPlayerToGame(Game game, Player player) {
 
-        GamePlayer gamePlayer = new GamePlayer();
-        gamePlayer.setGame(game);
-        gamePlayer.setPlayer(player);
-
-        gameRepository.save(game);
-
-        GamePlayer newGamePlayer = gamePlayerRepository.save(gamePlayer);
+        GamePlayer newGamePlayer = gamePlayerService.createGamePlayerAndGetEntity(game, player);
 
         game.getGamePlayers().add(newGamePlayer);
     }
