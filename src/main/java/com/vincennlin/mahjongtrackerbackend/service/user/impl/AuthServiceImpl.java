@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     public void authorizeOwnership(Long ownerId) {
         Long currentUserId = getCurrentUserId();
         if (!currentUserId.equals(ownerId) && !containsAuthority("ADVANCED")) {
-            throw new ResourceOwnershipException(currentUserId, ownerId);
+            throw new ResourceOwnershipException(currentUserId);
         }
     }
 

@@ -1,6 +1,8 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
+import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
+import com.vincennlin.mahjongtrackerbackend.exception.ResourceOwnershipException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.GameMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
@@ -51,6 +53,43 @@ public class GameServiceImpl implements GameService {
         Game newGame = gameRepository.save(game);
 
         return gameMapper.mapToDto(newGame);
+    }
+
+    @Override
+    public GameDto updateGame(Long gameId, GameDto gameDto) {
+
+        Game game = getGameEntityById(gameId);
+
+        authorizeOwnershipByGameCreatorId(game.getCreator().getId());
+
+        if (gameDto.getBasePoint() != null) game.setBasePoint(gameDto.getBasePoint());
+        if (gameDto.getFannPoint() != null) game.setFannPoint(gameDto.getFannPoint());
+        if (gameDto.getDollarPerPoint() != null) game.setDollarPerPoint(gameDto.getDollarPerPoint());
+
+        Game updatedGame = gameRepository.save(game);
+
+        return gameMapper.mapToDto(updatedGame);
+    }
+
+    @Override
+    public void deleteGameById(Long gameId) {
+
+        Game game = getGameEntityById(gameId);
+
+        authorizeOwnershipByGameCreatorId(game.getCreator().getId());
+
+        gameRepository.deleteById(gameId);
+    }
+
+    private void authorizeOwnershipByGameCreatorId(Long gameCreatorId) {
+        if (gameCreatorId != authService.getCurrentUserId()) {
+            throw new ResourceOwnershipException(authService.getCurrentUserId());
+        }
+    }
+
+    private Game getGameEntityById(Long gameId) {
+        return gameRepository.findById(gameId).orElseThrow(
+                () -> new ResourceNotFoundException("Game", "id", gameId));
     }
 
     private GamePageResponse getGamePageResponse(Page<Game> pageOfGames) {

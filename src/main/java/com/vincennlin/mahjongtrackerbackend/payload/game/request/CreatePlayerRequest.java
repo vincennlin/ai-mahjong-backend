@@ -18,7 +18,10 @@ public class CreatePlayerRequest {
     @JsonProperty(value = "type")
     private PlayerType type;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonProperty(value = "user_id")
-    private Long userId;
+    @JsonProperty(value = "player_name")
+    private String playerName;
+
+//    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+//    @JsonProperty(value = "user_id")
+//    private Long userId;
 }

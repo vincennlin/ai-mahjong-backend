@@ -27,4 +27,7 @@ public class Player {
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private PlayerType type;
+
+    @Column(name = "player_name")
+    private String playerName;
 }

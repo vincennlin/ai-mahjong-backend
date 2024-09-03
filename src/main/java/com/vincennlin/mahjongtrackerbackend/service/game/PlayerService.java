@@ -10,4 +10,8 @@ public interface PlayerService {
     PlayerPageResponse getPlayers(Pageable pageable);
 
     PlayerDto createPlayer(CreatePlayerRequest request);
+
+    PlayerDto updatePlayer(Long playerId, PlayerDto playerDto);
+
+    void deletePlayerById(Long playerId);
 }

@@ -1,7 +1,9 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
+import com.vincennlin.mahjongtrackerbackend.constant.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
+import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.PlayerMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.PlayerPageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreatePlayerRequest;
@@ -42,28 +44,84 @@ public class PlayerServiceImpl implements PlayerService {
         Player player = new Player();
         player.setType(request.getType());
 
-        User user;
-
-        if (request.getUserId() == null) {
-            user = authService.getCurrentUser();
-        } else {
-            user = userService.getUserEntityByUserId(request.getUserId());
-        }
-
+        User user = authService.getCurrentUser();
         player.setUser(user);
 
-        switch(request.getType()) {
-            case HUMAN:
-                break;
-            case BOT:
-                break;
-            case AI:
-                break;
+        if (request.getPlayerName() != null) {
+            player.setPlayerName(request.getPlayerName());
+        } else {
+            player.setPlayerName(getDefaultPlayerName(player));
         }
+
+        ;
+
+//        if (request.getType() == PlayerType.HUMAN && request.getUserId != authService.getCurrentUserId()) {
+//            throw new RuntimeException("Unauthorized");
+//        }
+//        if (request.getUserId() == null) {
+//            user = authService.getCurrentUser();
+//        } else {
+//            user = userService.getUserEntityByUserId(request.getUserId());
+//        }
 
         Player newPlayer = playerRepository.save(player);
 
         return playerMapper.mapToDto(newPlayer);
+    }
+
+    @Override
+    public PlayerDto updatePlayer(Long playerId, PlayerDto playerDto) {
+
+        Player player = getPlayerEntityById(playerId);
+
+        authorizeOwnershipByPlayerUserId(player.getUser().getId());
+
+        if (playerDto.getType() != null) player.setType(playerDto.getType());
+
+        if (playerDto.getPlayerName() != null) {
+            player.setPlayerName(playerDto.getPlayerName());
+        } else{
+            player.setPlayerName(getDefaultPlayerName(player));
+        }
+
+        Player updatedPlayer = playerRepository.save(player);
+
+        return playerMapper.mapToDto(updatedPlayer);
+    }
+
+    @Override
+    public void deletePlayerById(Long playerId) {
+
+        Player player = getPlayerEntityById(playerId);
+
+        authorizeOwnershipByPlayerUserId(player.getUser().getId());
+
+        playerRepository.deleteById(playerId);
+    }
+
+    private String getDefaultPlayerName(Player player) {
+        String playerName = player.getUser().getUsername();
+
+        if (player.getType() == PlayerType.BOT) {
+            Integer botCount = playerRepository.countByUserIdAndTypeIs(player.getUser().getId(), PlayerType.BOT);
+            playerName += "_BOT" + (botCount + 1);
+        } else if (player.getType() == PlayerType.AI) {
+            Integer aiCount = playerRepository.countByUserIdAndTypeIs(player.getUser().getId(), PlayerType.AI);
+            playerName += "_AI" + (aiCount + 1);
+        }
+
+        return playerName;
+    }
+
+    private void authorizeOwnershipByPlayerUserId(Long userId) {
+        if (!authService.getCurrentUser().getId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+    }
+
+    private Player getPlayerEntityById(Long playerId) {
+        return playerRepository.findById(playerId).orElseThrow(
+                () -> new ResourceNotFoundException("Player", "id", playerId));
     }
 
     private PlayerPageResponse getPlayerPageResponse(Page<Player> pageOfPlayers) {

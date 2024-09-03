@@ -24,11 +24,11 @@ public class GameDto {
     private UserDto creator;
 
     @JsonProperty(value = "base_point")
-    private int basePoint;
+    private Integer basePoint;
 
     @JsonProperty(value = "fann_point")
-    private int fannPoint;
+    private Integer fannPoint;
 
     @JsonProperty(value = "dollar_per_point")
-    private int dollarPerPoint;
+    private Integer dollarPerPoint;
 }

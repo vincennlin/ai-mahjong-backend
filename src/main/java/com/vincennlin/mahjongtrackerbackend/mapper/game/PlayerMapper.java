@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.mapper.game;
 
+import com.vincennlin.mahjongtrackerbackend.constant.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerDto;

@@ -10,4 +10,8 @@ public interface GameService {
     GamePageResponse getGames(Pageable pageable);
 
     GameDto createGame(CreateGameRequest request);
+
+    GameDto updateGame(Long gameId, GameDto gameDto);
+
+    void deleteGameById(Long gameId);
 }
