@@ -2,7 +2,6 @@ package com.vincennlin.mahjongtrackerbackend.service.user;
 
 import com.vincennlin.mahjongtrackerbackend.payload.user.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
