@@ -2,7 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.payload.game.wind;
 
 public interface AbstractWind {
 
-    int getWindValue();
+    int getWindOrder();
 
-    String getWindString();
+    Wind nextWind();
 }

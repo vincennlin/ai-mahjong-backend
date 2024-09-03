@@ -5,53 +5,81 @@ import lombok.Getter;
 @Getter
 public enum Wind implements AbstractWind{
 
-    EAST{
+    EAST {
         @Override
-        public int getWindValue() {
-            return 0;
+        public int getWindOrder() {
+            return ordinal();
         }
 
         @Override
-        public String getWindString() {
+        public Wind nextWind() {
+            return SOUTH;
+        }
+
+        @Override
+        public String toString() {
             return "東";
         }
     },
 
-    SOUTH{
+    SOUTH {
         @Override
-        public int getWindValue() {
-            return 1;
+        public int getWindOrder() {
+            return ordinal();
         }
 
         @Override
-        public String getWindString() {
+        public Wind nextWind() {
+            return WEST;
+        }
+
+        @Override
+        public String toString() {
             return "南";
         }
     },
 
-    WEST{
+    WEST {
         @Override
-        public int getWindValue() {
-            return 2;
+        public int getWindOrder() {
+            return ordinal();
         }
 
         @Override
-        public String getWindString() {
+        public Wind nextWind() {
+            return NORTH;
+        }
+
+        @Override
+        public String toString() {
             return "西";
         }
     },
 
-    NORTH{
+    NORTH {
         @Override
-        public int getWindValue() {
-            return 3;
+        public int getWindOrder() {
+            return ordinal();
         }
 
         @Override
-        public String getWindString() {
+        public Wind nextWind() {
+            return EAST;
+        }
+
+        @Override
+        public String toString() {
             return "北";
         }
     };
 
-
+    public static Wind getWind(int windOrder){
+        return switch (windOrder) {
+            case 0 -> EAST;
+            case 1 -> SOUTH;
+            case 2 -> WEST;
+            case 3 -> NORTH;
+            default -> throw new IllegalArgumentException("Invalid wind value: " + windOrder);
+        };
+    }
 }
