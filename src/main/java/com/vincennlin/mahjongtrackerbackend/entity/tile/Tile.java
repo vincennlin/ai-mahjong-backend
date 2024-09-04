@@ -23,6 +23,6 @@ public class Tile {
     @Column(name = "type")
     private TileType type;
 
-    @Column(name = "rank")
-    private int rank;
+    @Column(name = "tileRank")
+    private int tileRank;
 }

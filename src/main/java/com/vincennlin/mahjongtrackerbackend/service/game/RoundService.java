@@ -6,6 +6,8 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.dto.RoundDto;
 
 public interface RoundService {
 
+    RoundDto getCurrentRoundByGameId(Long gameId);
+
     Round startNewRoundAndGetEntity(Game game);
 
     RoundDto saveRound(Round round);

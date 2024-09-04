@@ -7,7 +7,8 @@ import com.vincennlin.mahjongtrackerbackend.entity.game.Round;
 import com.vincennlin.mahjongtrackerbackend.exception.GameProcessException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.HandMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.RoundStatus;
 import com.vincennlin.mahjongtrackerbackend.repository.game.HandRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
 import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
@@ -28,6 +29,18 @@ public class HandServiceImpl implements HandService {
     private final HandRepository handRepository;
 
     @Override
+    public HandDto getCurrentHandByGameId(Long gameId) {
+
+        Game game = gameService.getGameEntityById(gameId);
+
+        Round round = game.getCurrentRound();
+
+        Hand hand = round.getCurrentHand();
+
+        return handMapper.mapToDto(hand, round.getRoundWind());
+    }
+
+    @Override
     public HandDto startNewHand(Long gameId) {
 
         Game game = gameService.getGameEntityById(gameId);
@@ -45,6 +58,12 @@ public class HandServiceImpl implements HandService {
         Hand hand = new Hand(round, round.getNextDealer(), round.getNextPrevailingWind());
 
         Hand newHand = handRepository.save(hand);
+
+        round.setStatus(RoundStatus.IN_PROGRESS);
+        roundService.saveRound(round);
+
+        game.setStatus(GameStatus.IN_PROGRESS);
+        gameService.saveGame(game);
 
         return handMapper.mapToDto(newHand, round.getRoundWind());
     }

@@ -1,7 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.HandStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

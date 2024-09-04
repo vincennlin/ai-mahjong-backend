@@ -44,6 +44,8 @@ public class GameMapper {
     }
 
     public GameDto mapToDto(Game game) {
-        return modelMapper.map(game, GameDto.class);
+        GameDto gameDto = modelMapper.map(game, GameDto.class);
+        gameDto.setAcceptableOperations(game.getStatus().getAcceptableOperations());
+        return gameDto;
     }
 }

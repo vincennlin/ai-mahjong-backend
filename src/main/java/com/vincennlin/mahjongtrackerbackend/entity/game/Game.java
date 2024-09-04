@@ -1,6 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import jakarta.persistence.*;

@@ -1,6 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.exception;
 
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

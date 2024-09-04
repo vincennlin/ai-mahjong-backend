@@ -1,7 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;

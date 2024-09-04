@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.GameStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GameOperation;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.user.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
@@ -26,6 +28,9 @@ public class GameDto {
 
     @JsonProperty(value = "status")
     private GameStatus status;
+
+    @JsonProperty(value = "acceptable_operations")
+    private Set<GameOperation> acceptableOperations;
 
     @JsonProperty(value = "creator")
     private UserDto creator;

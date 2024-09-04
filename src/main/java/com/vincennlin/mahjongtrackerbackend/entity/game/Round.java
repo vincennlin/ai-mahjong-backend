@@ -1,7 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.HandStatus;
-import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.RoundStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.RoundStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -50,6 +50,18 @@ public class Round {
     @CreationTimestamp
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
+
+    public Hand getCurrentHand() {
+        if (hands.isEmpty()) {
+            return null;
+        }
+        Hand currentHand = hands.get(hands.size() - 1);
+        if (currentHand.getStatus() != HandStatus.FINISHED) {
+            return currentHand;
+        } else {
+            return null;
+        }
+    }
 
     public Hand getPreivousHand() {
         if (hands.isEmpty()) {

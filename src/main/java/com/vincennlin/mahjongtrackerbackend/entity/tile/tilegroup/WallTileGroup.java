@@ -15,7 +15,6 @@ import lombok.Setter;
 @Table(name = "wall_tile_groups")
 public class WallTileGroup extends TileGroup {
 
-    @OneToOne(mappedBy = "wallTileGroup")
-    @JoinColumn(name = "hand_id", referencedColumnName = "id")
+    @OneToOne
     private Hand hand;
 }

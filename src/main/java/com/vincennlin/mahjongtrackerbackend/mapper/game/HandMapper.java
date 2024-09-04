@@ -27,6 +27,7 @@ public class HandMapper {
     public HandDto mapToDto(Hand hand, Wind roundWind) {
         HandDto handDto = modelMapper.map(hand, HandDto.class);
         handDto.setRoundWind(roundWind);
+        handDto.setAcceptableOperations(hand.getStatus().getAcceptableOperations());
         return handDto;
     }
 }
