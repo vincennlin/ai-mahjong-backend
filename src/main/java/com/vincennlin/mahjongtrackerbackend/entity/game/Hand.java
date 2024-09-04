@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.game.gamestatus.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import jakarta.persistence.*;
@@ -41,6 +42,9 @@ public class Hand {
     @ManyToOne
     @JoinColumn(name = "dealer_id", referencedColumnName = "id")
     private GamePlayer dealer;
+
+    @OneToOne(mappedBy = "hand")
+    private WallTileGroup wallTileGroup;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "prevailing_wind")
