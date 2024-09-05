@@ -63,6 +63,14 @@ public class HandController {
         return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
 
+    @PostMapping("/games/{game_id}/hands/break-wall")
+    public ResponseEntity<BoardDto> breakWall(@PathVariable(name = "game_id") Long gameId) {
+
+        BoardDto boardDto = handService.breakWall(gameId);
+
+        return new ResponseEntity<>(boardDto, HttpStatus.OK);
+    }
+
     @PostMapping("/games/{game_id}/hands/initial-foul-hand")
     public ResponseEntity<BoardDto> initialFoulHand(@PathVariable(name = "game_id") Long gameId) {
 

@@ -158,12 +158,21 @@ public class HandServiceImpl implements HandService {
     }
 
     @Override
+    public BoardDto breakWall(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        tileService.drawTile(hand.getDealer().getPlayerTile(), hand.getWallTileGroup(), true);
+
+        return boardMapper.mapToDto(handRepository.save(hand));
+    }
+
+    @Override
     public BoardDto initialFoulHand(Long gameId) {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
-        GamePlayer dealer = getCurrentHandEntityByGameId(gameId).getDealer();
-        GamePlayer currentPlayer = dealer;
+        GamePlayer currentPlayer = getCurrentHandEntityByGameId(gameId).getDealer();
 
         while (hand.getPlayerTiles().stream().anyMatch(
                 playerTile -> playerTile.getHandTiles().containsFlowerTile())) {

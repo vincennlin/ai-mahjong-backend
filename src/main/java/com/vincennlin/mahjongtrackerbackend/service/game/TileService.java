@@ -19,5 +19,7 @@ public interface TileService {
 
     void sortHandGroupTiles(List<PlayerTile> playerTileList);
 
-    PlayerTile initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
+    void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
+
+    boolean drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead);
 }

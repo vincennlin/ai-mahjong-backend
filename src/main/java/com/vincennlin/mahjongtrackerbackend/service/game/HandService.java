@@ -27,5 +27,7 @@ public interface HandService {
 
     BoardDto dealTiles(Long gameId);
 
+    BoardDto breakWall(Long gameId);
+
     BoardDto initialFoulHand(Long gameId);
 }
