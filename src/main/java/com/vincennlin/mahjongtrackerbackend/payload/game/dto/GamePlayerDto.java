@@ -24,12 +24,6 @@ public class GamePlayerDto {
     @JsonProperty(value = "downwind_player")
     private GamePlayerDto downwindPlayer;
 
-    @JsonProperty(value = "opposite_player")
-    private GamePlayerDto oppositePlayer;
-
-    @JsonProperty(value = "upwind_player")
-    private GamePlayerDto upwindPlayer;
-
 //    @JsonProperty(value = "game_id")
 //    private Long gameId;
 //

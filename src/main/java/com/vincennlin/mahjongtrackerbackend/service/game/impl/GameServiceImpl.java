@@ -199,8 +199,6 @@ public class GameServiceImpl implements GameService {
         for (int i = 0; i < playerCount; i++) {
             GamePlayer gamePlayer = gamePlayerList.get(i);
             gamePlayer.setDownwindPlayer(gamePlayerList.get((i + 1) % playerCount));
-            gamePlayer.setOppositePlayer(gamePlayerList.get((i + 2) % playerCount));
-            gamePlayer.setUpwindPlayer(gamePlayerList.get((i + 3) % playerCount));
         }
 
         game.setEastPlayer(gamePlayerList.get(0));

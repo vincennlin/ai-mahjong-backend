@@ -27,14 +27,6 @@ public class GamePlayer {
     private Player player;
 
     @OneToOne
-    @JoinColumn(name = "upwind_player_id", referencedColumnName = "id")
-    private GamePlayer upwindPlayer;
-
-    @OneToOne
-    @JoinColumn(name = "opposite_player_id", referencedColumnName = "id")
-    private GamePlayer oppositePlayer;
-
-    @OneToOne
     @JoinColumn(name = "downwind_player_id", referencedColumnName = "id")
     private GamePlayer downwindPlayer;
 
