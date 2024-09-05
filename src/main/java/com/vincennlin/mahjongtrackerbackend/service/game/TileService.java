@@ -16,4 +16,6 @@ public interface TileService {
     List<PlayerTile> savePlayerTileList(List<PlayerTile> playerTileList);
 
     List<PlayerTile> dealTiles(Hand hand);
+
+    void sortHandGroupTiles(List<PlayerTile> playerTileList);
 }

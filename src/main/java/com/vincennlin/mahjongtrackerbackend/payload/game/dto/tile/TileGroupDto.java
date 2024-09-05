@@ -17,6 +17,9 @@ public abstract class TileGroupDto {
     @JsonProperty(value = "id")
     private Long id;
 
+    @JsonProperty(value = "tile_count")
+    private int tileCount;
+
     @JsonProperty(value = "tiles")
     private List<BoardTileDto> tiles;
 }

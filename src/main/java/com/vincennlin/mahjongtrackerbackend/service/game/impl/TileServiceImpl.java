@@ -10,6 +10,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.ExposedTileGro
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.HandTileGroup;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.TileComparator;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import com.vincennlin.mahjongtrackerbackend.repository.game.*;
 import com.vincennlin.mahjongtrackerbackend.service.game.TileService;
@@ -124,9 +125,14 @@ public class TileServiceImpl implements TileService {
             tile.getTileGroup().getTiles().add(tile);
         }
 
-        List<PlayerTile> updatedPlayerTileList = savePlayerTileList(playerTileList);
+        return savePlayerTileList(playerTileList);
+    }
 
-        return updatedPlayerTileList;
+    @Override
+    public void sortHandGroupTiles(List<PlayerTile> playerTileList) {
+        for (PlayerTile playerTile : playerTileList) {
+            playerTile.getHandTiles().sortHandTiles();
+        }
     }
 
     private int getFirstTileIndex(Integer diceNumber) {

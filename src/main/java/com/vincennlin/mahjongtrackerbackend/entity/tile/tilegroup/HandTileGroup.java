@@ -1,11 +1,15 @@
 package com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.TileComparator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Comparator;
 
 @Setter
 @Getter
@@ -26,5 +30,9 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     @Override
     public Long getPlayerId() {
         return playerTile.getGamePlayer().getId();
+    }
+
+    public void sortHandTiles() {
+        getTiles().sort(new TileComparator());
     }
 }

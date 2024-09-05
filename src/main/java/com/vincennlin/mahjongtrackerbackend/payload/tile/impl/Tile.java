@@ -5,7 +5,7 @@ import com.vincennlin.mahjongtrackerbackend.payload.tile.type.TileType;
 import lombok.Getter;
 
 @Getter
-public enum Tile implements TileInterface {
+public enum Tile implements TileInterface, Comparable<Tile> {
 
     CHARACTER_1("一萬", 1, TileType.SUIT),
     CHARACTER_2("二萬", 2, TileType.SUIT),

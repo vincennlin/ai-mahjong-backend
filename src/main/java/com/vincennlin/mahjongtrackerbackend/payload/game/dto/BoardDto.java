@@ -23,15 +23,15 @@ public class BoardDto {
     @JsonProperty(value = "hand_id")
     private Long handId;
 
-    @JsonProperty(value = "wall_tiles")
-    private WallTileGroupDto wallTiles;
-
-    @JsonProperty(value = "player_tiles")
-    private List<PlayerTileDto> playerTiles;
-
     @JsonProperty(value = "round_wind")
     private Wind RoundWind;
 
     @JsonProperty(value = "prevailing_wind")
     private Wind prevailingWind;
+
+    @JsonProperty(value = "player_tiles")
+    private List<PlayerTileDto> playerTiles;
+
+    @JsonProperty(value = "wall_tiles")
+    private WallTileGroupDto wallTiles;
 }

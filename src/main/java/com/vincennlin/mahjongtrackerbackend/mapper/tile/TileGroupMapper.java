@@ -2,7 +2,6 @@ package com.vincennlin.mahjongtrackerbackend.mapper.tile;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
-import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.HandTileGroup;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.PlayerTileGroup;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.BoardTileDto;
@@ -34,6 +33,7 @@ public class TileGroupMapper {
     public WallTileGroupDto mapWallTileGroupToDto(WallTileGroup wallTileGroup) {
         WallTileGroupDto wallTileGroupDto = modelMapper.map(wallTileGroup, WallTileGroupDto.class);
         wallTileGroupDto.setHandId(wallTileGroup.getHand().getId());
+        wallTileGroupDto.setTileCount(wallTileGroup.getTiles().size());
         wallTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(wallTileGroup.getTiles()));
         return wallTileGroupDto;
     }
@@ -41,6 +41,7 @@ public class TileGroupMapper {
     public PlayerTileGroupDto mapPlayerTileGroupToDto(PlayerTileGroup playerTileGroup) {
         PlayerTileGroupDto playerTileGroupDto = modelMapper.map(playerTileGroup, PlayerTileGroupDto.class);
         playerTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(playerTileGroup.getTiles()));
+        playerTileGroupDto.setTileCount(playerTileGroupDto.getTiles().size());
         playerTileGroupDto.setPlayerId(playerTileGroup.getPlayerId());
         return playerTileGroupDto;
     }
