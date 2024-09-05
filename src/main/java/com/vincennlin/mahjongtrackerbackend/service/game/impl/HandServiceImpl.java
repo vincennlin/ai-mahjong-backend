@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
+import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Round;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
@@ -68,6 +69,11 @@ public class HandServiceImpl implements HandService {
         tileService.sortHandGroupTiles(hand.getPlayerTiles());
 
         return boardMapper.mapToDto(hand);
+    }
+
+    @Override
+    public List<PlayerTile> getPlayerTileEntityListByGameId(Long gameId) {
+        return getCurrentHandEntityByGameId(gameId).getPlayerTiles();
     }
 
     @Override
@@ -149,5 +155,30 @@ public class HandServiceImpl implements HandService {
         Hand savedHand = handRepository.save(hand);
 
         return boardMapper.mapToDto(savedHand);
+    }
+
+    @Override
+    public BoardDto initialFoulHand(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        GamePlayer dealer = getCurrentHandEntityByGameId(gameId).getDealer();
+        GamePlayer currentPlayer = dealer;
+
+        while (hand.getPlayerTiles().stream().anyMatch(
+                playerTile -> playerTile.getHandTiles().containsFlowerTile())) {
+            for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
+                PlayerTile playerTile = currentPlayer.getPlayerTile();
+                if (playerTile.getHandTiles().containsFlowerTile()) {
+                    playerTile.getHandTiles().sortHandTiles();
+                    tileService.initialFoulHand(playerTile, hand.getWallTileGroup());
+                }
+                currentPlayer = currentPlayer.getDownwindPlayer();
+            }
+        }
+
+        tileService.sortHandGroupTiles(hand.getPlayerTiles());
+
+        return boardMapper.mapToDto(handRepository.save(hand));
     }
 }

@@ -5,13 +5,11 @@ import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
-import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.DiscardedTileGroup;
-import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.ExposedTileGroup;
-import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.HandTileGroup;
-import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.*;
 import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.TileComparator;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.type.TileType;
 import com.vincennlin.mahjongtrackerbackend.repository.game.*;
 import com.vincennlin.mahjongtrackerbackend.service.game.TileService;
 import lombok.AllArgsConstructor;
@@ -133,6 +131,36 @@ public class TileServiceImpl implements TileService {
         for (PlayerTile playerTile : playerTileList) {
             playerTile.getHandTiles().sortHandTiles();
         }
+    }
+
+    @Override
+    public PlayerTile initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
+
+        List<BoardTile> handTiles = playerTile.getHandTiles().getTiles();
+        List<BoardTile> exposedTiles = playerTile.getExposedTiles().getTiles();
+
+        List<BoardTile> tiles = new ArrayList<>();
+
+        while (handTiles.get(handTiles.size() - 1).getTile().isFlower()) {
+            BoardTile tile = handTiles.remove(handTiles.size() - 1);
+            exposedTiles.add(tile);
+            tile.setTileGroup(playerTile.getExposedTiles());
+
+            List<BoardTile> wallTiles = wallTileGroup.getTiles();
+
+            BoardTile newTile = wallTiles.remove(wallTiles.size() - 1);
+            newTile.setTileGroup(playerTile.getHandTiles());
+            handTiles.add(0, newTile);
+
+            tiles.add(tile);
+            tiles.add(newTile);
+        }
+
+        playerTile.getHandTiles().sortHandTiles();
+
+        saveBoardTiles(tiles);
+
+        return playerTileRepository.save(playerTile);
     }
 
     private int getFirstTileIndex(Integer diceNumber) {

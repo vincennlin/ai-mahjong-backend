@@ -63,4 +63,8 @@ public enum Tile implements TileInterface, Comparable<Tile> {
         this.rank = rank;
         this.tileType = tileType;
     }
+
+    public boolean isFlower() {
+        return this.tileType == TileType.FLOWER;
+    }
 }

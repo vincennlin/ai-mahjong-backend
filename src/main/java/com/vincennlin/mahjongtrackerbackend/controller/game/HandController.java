@@ -62,4 +62,12 @@ public class HandController {
 
         return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
+
+    @PostMapping("/games/{game_id}/hands/initial-foul-hand")
+    public ResponseEntity<BoardDto> initialFoulHand(@PathVariable(name = "game_id") Long gameId) {
+
+        BoardDto boardDto = handService.initialFoulHand(gameId);
+
+        return new ResponseEntity<>(boardDto, HttpStatus.OK);
+    }
 }

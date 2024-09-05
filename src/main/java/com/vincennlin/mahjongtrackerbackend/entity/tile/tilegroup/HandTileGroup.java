@@ -35,4 +35,8 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     public void sortHandTiles() {
         getTiles().sort(new TileComparator());
     }
+
+    public boolean containsFlowerTile() {
+        return getTiles().stream().anyMatch(BoardTile::isFlower);
+    }
 }

@@ -1,8 +1,11 @@
 package com.vincennlin.mahjongtrackerbackend.service.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
+
+import java.util.List;
 
 public interface HandService {
 
@@ -14,6 +17,8 @@ public interface HandService {
 
     BoardDto getBoardByGameId(Long gameId);
 
+    List<PlayerTile> getPlayerTileEntityListByGameId(Long gameId);
+
     HandDto startNewHand(Long gameId);
 
     BoardDto initializeWallTiles(Long gameId);
@@ -21,4 +26,6 @@ public interface HandService {
     HandDto rollDice(Long gameId);
 
     BoardDto dealTiles(Long gameId);
+
+    BoardDto initialFoulHand(Long gameId);
 }

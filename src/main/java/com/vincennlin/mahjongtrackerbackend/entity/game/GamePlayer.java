@@ -1,10 +1,15 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
+import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -44,4 +49,16 @@ public class GamePlayer {
 //
 //    @Column(name = "self_drawn_against")
 //    private int selfDrawnAgainst;
+
+    public int getPositionIndex() {
+        return game.getGamePlayers().indexOf(this);
+    }
+
+    public PlayerTile getPlayerTile() {
+        List<PlayerTile> playerTiles = game.getCurrentHand().getPlayerTiles();
+        return playerTiles.stream()
+                .filter(playerTile -> playerTile.getGamePlayer().equals(this))
+                .findFirst()
+                .orElseThrow(() -> new InternalGameError(HttpStatus.INTERNAL_SERVER_ERROR, "Player tile not found"));
+    }
 }

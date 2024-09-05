@@ -18,4 +18,6 @@ public interface TileService {
     List<PlayerTile> dealTiles(Hand hand);
 
     void sortHandGroupTiles(List<PlayerTile> playerTileList);
+
+    PlayerTile initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
 }

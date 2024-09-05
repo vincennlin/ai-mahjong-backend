@@ -32,4 +32,8 @@ public class BoardTile {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tile_group_id", referencedColumnName = "id")
     private TileGroup tileGroup;
+
+    public boolean isFlower() {
+        return tile.isFlower();
+    }
 }
