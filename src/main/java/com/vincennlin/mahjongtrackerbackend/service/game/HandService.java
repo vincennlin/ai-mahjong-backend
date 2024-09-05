@@ -12,6 +12,8 @@ public interface HandService {
 
     Hand getHandEntityById(Long handId);
 
+    BoardDto getBoardByGameId(Long gameId);
+
     HandDto startNewHand(Long gameId);
 
     BoardDto initializeWallTiles(Long gameId);

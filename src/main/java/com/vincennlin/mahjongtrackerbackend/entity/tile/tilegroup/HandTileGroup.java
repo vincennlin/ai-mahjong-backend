@@ -10,10 +10,14 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "hand_tile_groups")
 public class HandTileGroup extends TileGroup implements PlayerTileGroup {
+
+    public HandTileGroup(PlayerTile playerTile) {
+        super();
+        this.playerTile = playerTile;
+    }
 
     @OneToOne(mappedBy = "handTiles")
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")

@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
@@ -11,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -45,6 +47,9 @@ public class Hand {
 
     @OneToOne(mappedBy = "hand")
     private WallTileGroup wallTileGroup;
+
+    @OneToMany(mappedBy = "hand", fetch = FetchType.EAGER)
+    private List<PlayerTile> playerTiles;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "prevailing_wind")

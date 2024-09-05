@@ -4,6 +4,7 @@ import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Round;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.exception.ProcessException;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -57,6 +59,14 @@ public class HandServiceImpl implements HandService {
 
         return handRepository.findById(handId).orElseThrow(() ->
             new ResourceNotFoundException("Hand", "id", handId));
+    }
+
+    @Override
+    public BoardDto getBoardByGameId(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        return boardMapper.mapToDto(hand);
     }
 
     @Override
@@ -103,7 +113,7 @@ public class HandServiceImpl implements HandService {
 
         Hand savedHand = handRepository.save(hand);
 
-        return boardMapper.mapToDto(savedHand, new ArrayList<>());
+        return boardMapper.mapToDto(savedHand);
     }
 
     @Override
@@ -115,7 +125,7 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in ready to roll dice state");
         }
 
-        Integer diceNumber = (int) ((Math.random() * 6) + 1) * DefaultGameConstants.DEFAULT_DICE_COUNT;
+        Integer diceNumber = (int) (((Math.random() * 6) + 1) + ((Math.random() * 6) + 1) + ((Math.random() * 6) + 1));
 
         hand.setDiceNumber(diceNumber);
         hand.setStatus(HandStatus.READY_TO_DEAL_TILES);
@@ -130,6 +140,13 @@ public class HandServiceImpl implements HandService {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
-        return null;
+        List<PlayerTile> playerTilesList = tileService.dealTiles(hand);
+
+        hand.setPlayerTiles(playerTilesList);
+        hand.setStatus(HandStatus.FINISHED_DEALING);
+
+        Hand savedHand = handRepository.save(hand);
+
+        return boardMapper.mapToDto(savedHand);
     }
 }

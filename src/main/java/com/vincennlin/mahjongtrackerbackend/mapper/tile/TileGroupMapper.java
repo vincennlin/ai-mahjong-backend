@@ -40,6 +40,7 @@ public class TileGroupMapper {
 
     public PlayerTileGroupDto mapPlayerTileGroupToDto(PlayerTileGroup playerTileGroup) {
         PlayerTileGroupDto playerTileGroupDto = modelMapper.map(playerTileGroup, PlayerTileGroupDto.class);
+        playerTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(playerTileGroup.getTiles()));
         playerTileGroupDto.setPlayerId(playerTileGroup.getPlayerId());
         return playerTileGroupDto;
     }

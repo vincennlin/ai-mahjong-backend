@@ -23,12 +23,14 @@ public class BoardMapper {
         this.tileGroupMapper = new TileGroupMapper();
     }
 
-    public BoardDto mapToDto(Hand hand, List<PlayerTile> playerTileList) {
+    public BoardDto mapToDto(Hand hand) {
         BoardDto boardDto = new BoardDto();
         boardDto.setHandId(hand.getId());
         boardDto.setWallTiles(tileGroupMapper.mapWallTileGroupToDto(hand.getWallTileGroup()));
-        for (PlayerTile playerTile : playerTileList) {
-            boardDto.getPlayerTiles().add(tileGroupMapper.mapPlayerTileToDto(playerTile));
+        if (hand.getPlayerTiles() != null) {
+            for (PlayerTile playerTile : hand.getPlayerTiles()) {
+                boardDto.getPlayerTiles().add(tileGroupMapper.mapPlayerTileToDto(playerTile));
+            }
         }
         boardDto.setRoundWind(hand.getRound().getRoundWind());
         boardDto.setPrevailingWind(hand.getPrevailingWind());

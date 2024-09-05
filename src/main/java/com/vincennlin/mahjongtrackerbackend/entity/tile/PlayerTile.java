@@ -17,6 +17,11 @@ import lombok.Setter;
 @Table(name = "player_tiles")
 public class PlayerTile {
 
+    public PlayerTile(Hand hand, GamePlayer gamePlayer) {
+        this.hand = hand;
+        this.gamePlayer = gamePlayer;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

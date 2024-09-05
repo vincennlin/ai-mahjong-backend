@@ -6,16 +6,19 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.WallTileGroupD
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class BoardDto {
+
+    public BoardDto() {
+        this.playerTiles = new ArrayList<>();
+    }
 
     @JsonProperty(value = "hand_id")
     private Long handId;
