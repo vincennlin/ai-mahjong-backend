@@ -37,4 +37,7 @@ public class HandDto {
 
     @JsonProperty(value = "dealer")
     private HandPlayerDto dealer;
+
+    @JsonProperty(value = "dice_number")
+    private Integer diceNumber;
 }

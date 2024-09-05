@@ -24,7 +24,7 @@ public class Hand {
         this.round = round;
         this.dealer = dealer;
         this.prevailingWind = prevailingWind;
-        this.status = HandStatus.READY_TO_DEAL;
+        this.status = HandStatus.READY_TO_INITIALIZE_WALL_TILES;
     }
 
     @Id
@@ -49,6 +49,9 @@ public class Hand {
     @Enumerated(EnumType.STRING)
     @Column(name = "prevailing_wind")
     private Wind prevailingWind;
+
+    @Column(name = "dice_number")
+    private Integer diceNumber;
 
     @ManyToOne
     @JoinColumn(name = "winner_id", referencedColumnName = "id")

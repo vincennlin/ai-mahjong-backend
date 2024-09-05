@@ -39,6 +39,14 @@ public class HandController {
         return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
 
+    @PostMapping("/games/{game_id}/hands/roll-dice")
+    public ResponseEntity<HandDto> rollDice(@PathVariable(name = "game_id") Long gameId) {
+
+        HandDto handDto = handService.rollDice(gameId);
+
+        return new ResponseEntity<>(handDto, HttpStatus.OK);
+    }
+
     @PostMapping("/games/{game_id}/hands/deal-tiles")
     public ResponseEntity<BoardDto> dealTiles(@PathVariable(name = "game_id") Long gameId) {
 
