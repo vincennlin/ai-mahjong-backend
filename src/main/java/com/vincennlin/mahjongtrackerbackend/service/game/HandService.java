@@ -8,5 +8,6 @@ public interface HandService {
 
     HandDto startNewHand(Long gameId);
 
+
     int rollDice();
 }

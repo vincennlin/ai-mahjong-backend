@@ -17,6 +17,10 @@ public class GamePlayerMapper {
     }
 
     public GamePlayerDto mapToDto(GamePlayer gamePlayer) {
+        GamePlayerDto gamePlayerDto = modelMapper.map(gamePlayer, GamePlayerDto.class);
+        gamePlayerDto.setPlayerId(gamePlayer.getPlayer().getId());
+        gamePlayerDto.setType(gamePlayer.getPlayer().getType());
+        gamePlayerDto.setPlayerName(gamePlayer.getPlayer().getPlayerName());
         return modelMapper.map(gamePlayer, GamePlayerDto.class);
     }
 }

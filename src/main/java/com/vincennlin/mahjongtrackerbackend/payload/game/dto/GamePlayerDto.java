@@ -3,6 +3,7 @@ package com.vincennlin.mahjongtrackerbackend.payload.game.dto;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,8 +19,14 @@ public class GamePlayerDto {
     @JsonProperty(value = "id")
     private Long id;
 
-    @JsonProperty(value = "player")
-    private PlayerDto player;
+    @JsonProperty(value = "player_id")
+    private Long playerId;
+
+    @JsonProperty(value = "type")
+    private PlayerType type;
+
+    @JsonProperty(value = "player_name")
+    private String playerName;
 
     @JsonProperty(value = "downwind_player")
     private GamePlayerDto downwindPlayer;

@@ -21,4 +21,9 @@ public class ExposedTileGroup extends TileGroup implements PlayerTileGroup {
     @OneToOne(mappedBy = "exposedTiles")
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
+
+    @Override
+    public Long getPlayerId() {
+        return playerTile.getGamePlayer().getId();
+    }
 }

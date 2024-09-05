@@ -20,8 +20,8 @@ public class PlayerDto {
     @JsonProperty(value = "type")
     private PlayerType type;
 
-    @JsonProperty(value = "user")
-    private UserDto user;
+    @JsonProperty(value = "user_name")
+    private String userName;
 
     @JsonProperty(value = "player_name")
     private String playerName;
