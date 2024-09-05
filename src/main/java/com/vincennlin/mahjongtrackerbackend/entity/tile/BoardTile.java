@@ -16,6 +16,11 @@ import lombok.Setter;
 @Table(name = "board_tiles")
 public class BoardTile {
 
+    public BoardTile(Tile tile, TileGroup tileGroup) {
+        this.tile = tile;
+        this.tileGroup = tileGroup;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

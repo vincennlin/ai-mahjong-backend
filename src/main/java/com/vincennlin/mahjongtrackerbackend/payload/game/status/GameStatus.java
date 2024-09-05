@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.Set;
 
 @Getter
-public enum GameStatus {
+public enum GameStatus implements ProcessStatus {
     WAITING_FOR_PLAYERS(Set.of(GameOperation.ADD_PLAYER)),
     READY_TO_START(Set.of(GameOperation.PICK_SEATS)),
     FINISHED_PICKING_SEATS(Set.of(GameOperation.DECIDE_EAST_PLAYER)),

@@ -28,9 +28,6 @@ public class GamePlayerDto {
     @JsonProperty(value = "player_name")
     private String playerName;
 
-    @JsonProperty(value = "downwind_player")
-    private GamePlayerDto downwindPlayer;
-
 //    @JsonProperty(value = "game_id")
 //    private Long gameId;
 //

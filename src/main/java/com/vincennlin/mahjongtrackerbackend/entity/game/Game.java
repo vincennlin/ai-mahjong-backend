@@ -93,4 +93,8 @@ public class Game {
         }
         return rounds.get(rounds.size() - 1);
     }
+
+    public Hand getCurrentHand() {
+        return getCurrentRound().getCurrentHand();
+    }
 }

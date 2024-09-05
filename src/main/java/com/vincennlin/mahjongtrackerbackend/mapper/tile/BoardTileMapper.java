@@ -6,6 +6,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class BoardTileMapper {
 
@@ -17,8 +19,10 @@ public class BoardTileMapper {
     }
 
     public BoardTileDto mapToDto(BoardTile boardTile) {
-        BoardTileDto boardTileDto = modelMapper.map(boardTile, BoardTileDto.class);
-        boardTileDto.setTileName(boardTile.getTile().getName());
-        return boardTileDto;
+        return new BoardTileDto(boardTile.getTile().getName());
+    }
+
+    public List<BoardTileDto> mapBoardTilesToDto(List<BoardTile> boardTiles) {
+        return boardTiles.stream().map(this::mapToDto).toList();
     }
 }

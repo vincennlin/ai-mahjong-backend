@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.Set;
 
 @Getter
-public enum HandStatus {
+public enum HandStatus implements ProcessStatus {
     READY_TO_DEAL(Set.of(HandOperation.DEAL_TILES)),
     FINISHED_DEALING(Set.of(HandOperation.BREAK_WALL)),
     FINISHED_BREAKING_WALL(Set.of(HandOperation.FOUL_HAND)),

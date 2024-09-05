@@ -1,11 +1,11 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
+import com.vincennlin.mahjongtrackerbackend.exception.ProcessException;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
-import com.vincennlin.mahjongtrackerbackend.exception.GameProcessException;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceOwnershipException;
 import com.vincennlin.mahjongtrackerbackend.exception.WebAPIException;
@@ -189,7 +189,7 @@ public class GameServiceImpl implements GameService {
         Game game = getGameEntityById(gameId);
 
         if (game.getStatus() != GameStatus.READY_TO_START) {
-            throw new GameProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in ready state");
+            throw new ProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in ready state");
         }
 
         List<GamePlayer> gamePlayerList = game.getGamePlayers();
@@ -216,11 +216,18 @@ public class GameServiceImpl implements GameService {
         Game game = getGameEntityById(gameId);
 
         if (game.getStatus() != GameStatus.FINISHED_PICKING_SEATS) {
-            throw new GameProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in finished picking seats state");
+            throw new ProcessException(HttpStatus.BAD_REQUEST, game.getStatus(), "Game is not in finished picking seats state");
         }
 
         int randomIndex = (int) (Math.random() * 4);
         game.setEastPlayer(game.getGamePlayers().get(randomIndex));
+
+        GamePlayer currentPlayer = game.getEastPlayer();
+
+        for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
+            game.getGamePlayers().set(i, currentPlayer);
+            currentPlayer = currentPlayer.getDownwindPlayer();
+        }
 
         game.setStatus(GameStatus.READY_TO_START_NEW_ROUND);
 

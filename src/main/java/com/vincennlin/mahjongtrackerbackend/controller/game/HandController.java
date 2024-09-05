@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.controller.game;
 
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
 import lombok.AllArgsConstructor;
@@ -28,5 +29,21 @@ public class HandController {
         HandDto handDto = handService.startNewHand(gameId);
 
         return new ResponseEntity<>(handDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/games/{game_id}/hands/initialize-wall-tiles")
+    public ResponseEntity<BoardDto> initializeWallTiles(@PathVariable(name = "game_id") Long gameId) {
+
+        BoardDto boardDto = handService.initializeWallTiles(gameId);
+
+        return new ResponseEntity<>(boardDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/games/{game_id}/hands/deal-tiles")
+    public ResponseEntity<BoardDto> dealTiles(@PathVariable(name = "game_id") Long gameId) {
+
+        BoardDto boardDto = handService.dealTiles(gameId);
+
+        return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
 }

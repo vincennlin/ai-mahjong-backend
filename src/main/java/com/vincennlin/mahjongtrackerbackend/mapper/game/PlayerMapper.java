@@ -24,6 +24,8 @@ public class PlayerMapper {
     }
 
     public PlayerDto mapToDto(Player player) {
-        return modelMapper.map(player, PlayerDto.class);
+        PlayerDto playerDto = modelMapper.map(player, PlayerDto.class);
+        playerDto.setUserName(player.getUser().getUsername());
+        return playerDto;
     }
 }

@@ -18,10 +18,13 @@ import org.springframework.stereotype.Component;
 public class TileGroupMapper {
 
     private final ModelMapper modelMapper;
+    private final BoardTileMapper boardTileMapper;
 
     public TileGroupMapper() {
         this.modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+        this.boardTileMapper = new BoardTileMapper();
 
         Converter<BoardTile, BoardTileDto> boardTileConverter = context ->
                 context.getSource() == null ? null : modelMapper.map(context.getSource(), BoardTileDto.class);
@@ -31,6 +34,7 @@ public class TileGroupMapper {
     public WallTileGroupDto mapWallTileGroupToDto(WallTileGroup wallTileGroup) {
         WallTileGroupDto wallTileGroupDto = modelMapper.map(wallTileGroup, WallTileGroupDto.class);
         wallTileGroupDto.setHandId(wallTileGroup.getHand().getId());
+        wallTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(wallTileGroup.getTiles()));
         return wallTileGroupDto;
     }
 

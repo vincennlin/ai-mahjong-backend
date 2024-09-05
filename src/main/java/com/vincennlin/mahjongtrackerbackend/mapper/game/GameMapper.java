@@ -11,22 +11,24 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class GameMapper {
 
     private final ModelMapper modelMapper;
+    private final GamePlayerMapper gamePlayerMapper;
 
     public GameMapper() {
         this.modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
+        this.gamePlayerMapper = new GamePlayerMapper();
+
         Converter<User, UserDto> userConverter = context ->
                 context.getSource() == null ? null : modelMapper.map(context.getSource(), UserDto.class);
         modelMapper.addConverter(userConverter);
-
-        Converter<GamePlayer, GamePlayerDto> gamePlayerConverter = context ->
-                context.getSource() == null ? null : modelMapper.map(context.getSource(), GamePlayerDto.class);
-        modelMapper.addConverter(gamePlayerConverter);
 
 //        Converter<GamePlayer, GamePlayerDto> gamePlayerConverter = context ->{
 //            GamePlayer source = context.getSource();
@@ -46,6 +48,10 @@ public class GameMapper {
     public GameDto mapToDto(Game game) {
         GameDto gameDto = modelMapper.map(game, GameDto.class);
         gameDto.setAcceptableOperations(game.getStatus().getAcceptableOperations());
+        gameDto.setGamePlayers(gamePlayerMapper.mapGamePlayersToDto(game.getGamePlayers()));
+        if (game.getEastPlayer() != null) {
+            gameDto.setEastPlayer(gamePlayerMapper.mapToDto(game.getEastPlayer()));
+        }
         return gameDto;
     }
 }
