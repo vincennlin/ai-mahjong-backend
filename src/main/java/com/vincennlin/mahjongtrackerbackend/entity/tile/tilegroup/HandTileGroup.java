@@ -23,7 +23,11 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         this.playerTile = playerTile;
     }
 
-    @OneToOne(mappedBy = "handTiles")
+    @OneToOne(
+            mappedBy = "handTiles",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
 

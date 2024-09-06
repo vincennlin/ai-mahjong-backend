@@ -29,7 +29,10 @@ public class BoardTile {
     @Column(name = "tile")
     private Tile tile;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "tile_group_id", referencedColumnName = "id")
     private TileGroup tileGroup;
 

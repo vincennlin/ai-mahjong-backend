@@ -9,11 +9,13 @@ import java.util.List;
 
 public interface TileService {
 
+    List<PlayerTile> createPlayerTileList(Hand hand);
+
     WallTileGroup createWallTileGroup(Hand hand);
 
     List<BoardTile> saveBoardTiles(List<BoardTile> boardTiles);
 
-    List<PlayerTile> savePlayerTileList(List<PlayerTile> playerTileList);
+//    List<PlayerTile> savePlayerTileList(List<PlayerTile> playerTileList);
 
     List<PlayerTile> dealTiles(Hand hand);
 
@@ -21,5 +23,7 @@ public interface TileService {
 
     void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
 
-    boolean drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead);
+    BoardTile drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup);
+
+    BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
 }

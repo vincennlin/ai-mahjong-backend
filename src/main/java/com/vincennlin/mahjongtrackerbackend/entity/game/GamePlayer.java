@@ -27,11 +27,17 @@ public class GamePlayer {
     @JoinColumn(name = "game_id", referencedColumnName = "id")
     private Game game;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     private Player player;
 
-    @OneToOne
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "downwind_player_id", referencedColumnName = "id")
     private GamePlayer downwindPlayer;
 

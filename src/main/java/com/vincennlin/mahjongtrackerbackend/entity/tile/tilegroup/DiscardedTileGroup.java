@@ -1,10 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +18,11 @@ public class DiscardedTileGroup extends TileGroup implements PlayerTileGroup{
         this.playerTile = playerTile;
     }
 
-    @OneToOne(mappedBy = "discardedTiles")
+    @OneToOne(
+            mappedBy = "discardedTiles",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
 

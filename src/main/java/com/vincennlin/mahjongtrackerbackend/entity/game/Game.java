@@ -36,7 +36,9 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.EAGER
+    )
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
 
@@ -51,11 +53,18 @@ public class Game {
     )
     private List<GamePlayer> gamePlayers;
 
-    @ManyToOne
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}
+    )
     @JoinColumn(name = "east_player_id", referencedColumnName = "id")
     private GamePlayer eastPlayer;
 
-    @OneToMany(mappedBy = "game")
+    @OneToMany(
+            mappedBy = "game",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     private List<Round> rounds;
 
     @Column(name = "base_point")

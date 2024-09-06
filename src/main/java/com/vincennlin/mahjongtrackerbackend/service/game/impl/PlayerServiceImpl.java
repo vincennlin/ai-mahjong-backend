@@ -47,7 +47,6 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Player getCurrentPlayer() {
-
         return playerRepository.findByUserIdAndType(
                 authService.getCurrentUserId(), PlayerType.HUMAN).orElseGet(() -> {
                     Player player = new Player();

@@ -162,7 +162,7 @@ public class HandServiceImpl implements HandService {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
-        tileService.drawTile(hand.getDealer().getPlayerTile(), hand.getWallTileGroup(), true);
+        tileService.drawTile(hand.getDealer().getPlayerTile(), hand.getWallTileGroup());
 
         return boardMapper.mapToDto(handRepository.save(hand));
     }

@@ -36,10 +36,17 @@ public class Round {
     @Column(name = "status")
     private RoundStatus status;
 
-    @OneToMany(mappedBy = "round")
+    @OneToMany(
+            mappedBy = "round",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     private List<Hand> hands;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "game_id", referencedColumnName = "id")
     private Game game;
 

@@ -18,6 +18,9 @@ public class WallTileGroup extends TileGroup {
         this.hand = hand;
     }
 
-    @OneToOne
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     private Hand hand;
 }

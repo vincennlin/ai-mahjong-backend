@@ -30,6 +30,35 @@ public class TileServiceImpl implements TileService {
     private final PlayerTileRepository playerTileRepository;
 
     @Override
+    public List<PlayerTile> createPlayerTileList(Hand hand) {
+
+        GamePlayer currentPlayer = hand.getDealer();
+
+        List<PlayerTile> playerTileList = new ArrayList<>();
+
+        for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
+            PlayerTile playerTile = new PlayerTile(hand, currentPlayer);
+            playerTileList.add(playerTile);
+            currentPlayer = currentPlayer.getDownwindPlayer();
+        }
+
+        for (PlayerTile playerTile : playerTileList) {
+            playerTile = playerTileRepository.save(playerTile);
+
+            HandTileGroup handTileGroup = new HandTileGroup(playerTile);
+            playerTile.setHandTiles(handTileGroupRepository.save(handTileGroup));
+
+            ExposedTileGroup exposedTileGroup = new ExposedTileGroup(playerTile);
+            playerTile.setExposedTiles(exposedTileGroupRepository.save(exposedTileGroup));
+
+            DiscardedTileGroup discardedTileGroup = new DiscardedTileGroup(playerTile);
+            playerTile.setDiscardedTiles(discardedTileGroupRepository.save(discardedTileGroup));
+        }
+
+        return playerTileRepository.saveAll(playerTileList);
+    }
+
+    @Override
     public WallTileGroup createWallTileGroup(Hand hand) {
 
         WallTileGroup wallTileGroup = wallTileGroupRepository.save(new WallTileGroup(hand));
@@ -51,9 +80,11 @@ public class TileServiceImpl implements TileService {
 
         List<BoardTile> savedBoardTiles = saveBoardTiles(boardTiles);
 
-        wallTileGroup.setTiles(savedBoardTiles);
+        for (BoardTile boardTile : savedBoardTiles) {
+            boardTile.getTileGroup().getTiles().add(boardTile);
+        }
 
-        return wallTileGroup;
+        return wallTileGroupRepository.save(wallTileGroup);
     }
 
     @Override
@@ -62,46 +93,37 @@ public class TileServiceImpl implements TileService {
         return boardTileRepository.saveAll(boardTiles);
     }
 
-    @Override
-    public List<PlayerTile> savePlayerTileList(List<PlayerTile> playerTileList) {
-
-        for (PlayerTile playerTile : playerTileList) {
-            playerTile = playerTileRepository.save(playerTile);
-
-            HandTileGroup handTileGroup = playerTile.getHandTiles() == null ? new HandTileGroup(playerTile) : playerTile.getHandTiles();
-            playerTile.setHandTiles(handTileGroupRepository.save(handTileGroup));
-
-            ExposedTileGroup exposedTileGroup = playerTile.getExposedTiles() == null ? new ExposedTileGroup(playerTile) : playerTile.getExposedTiles();
-            playerTile.setExposedTiles(exposedTileGroupRepository.save(exposedTileGroup));
-
-            DiscardedTileGroup discardedTileGroup = playerTile.getDiscardedTiles() == null ? new DiscardedTileGroup(playerTile) : playerTile.getDiscardedTiles();
-            playerTile.setDiscardedTiles(discardedTileGroupRepository.save(discardedTileGroup));
-        }
-
-        return playerTileRepository.saveAll(playerTileList);
-    }
+//    @Override
+//    public List<PlayerTile> savePlayerTileList(List<PlayerTile> playerTileList) {
+//
+//        for (PlayerTile playerTile : playerTileList) {
+//            playerTile = playerTileRepository.save(playerTile);
+//
+//            HandTileGroup handTileGroup = playerTile.getHandTiles() == null ? new HandTileGroup(playerTile) : playerTile.getHandTiles();
+//            playerTile.setHandTiles(handTileGroupRepository.save(handTileGroup));
+//
+//            ExposedTileGroup exposedTileGroup = playerTile.getExposedTiles() == null ? new ExposedTileGroup(playerTile) : playerTile.getExposedTiles();
+//            playerTile.setExposedTiles(exposedTileGroupRepository.save(exposedTileGroup));
+//
+//            DiscardedTileGroup discardedTileGroup = playerTile.getDiscardedTiles() == null ? new DiscardedTileGroup(playerTile) : playerTile.getDiscardedTiles();
+//            playerTile.setDiscardedTiles(discardedTileGroupRepository.save(discardedTileGroup));
+//        }
+//
+//        return playerTileRepository.saveAll(playerTileList);
+//    }
 
     @Override
     public List<PlayerTile> dealTiles(Hand hand) {
 
-        List<BoardTile> wallTiles = hand.getWallTileGroup().getTiles();
+        WallTileGroup wallTileGroup = hand.getWallTileGroup();
+        List<BoardTile> wallTiles = wallTileGroup.getTiles();
         Integer diceNumber = hand.getDiceNumber();
 
-        GamePlayer currentPlayer = hand.getDealer();
-
-        List<PlayerTile> playerTileList = new ArrayList<>();
-
-        for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
-            PlayerTile playerTile = new PlayerTile(hand, currentPlayer);
-            playerTileList.add(playerTile);
-            currentPlayer = currentPlayer.getDownwindPlayer();
-        }
-
-        playerTileList = savePlayerTileList(playerTileList);
+        List<PlayerTile> playerTileList = createPlayerTileList(hand);
 
         int currentTileIndex = getFirstTileIndex(diceNumber);
 
-        List<BoardTile> tiles = new ArrayList<>();
+        GamePlayer currentPlayer = hand.getDealer();
 
         for (int round = 0; round < 4; round++) {
             for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
@@ -110,18 +132,13 @@ public class TileServiceImpl implements TileService {
                     if (currentTileIndex > wallTiles.size() - 1) currentTileIndex = 0;
                     BoardTile tile = wallTiles.remove(currentTileIndex);
                     tile.setTileGroup(handTileGroup);
-                    tiles.add(tile);
+                    tile.getTileGroup().getTiles().add(tile);
                 }
+                currentPlayer = currentPlayer.getDownwindPlayer();
             }
         }
 
-        List<BoardTile> updatedTiles = saveBoardTiles(tiles);
-
-        for (BoardTile tile : updatedTiles) {
-            tile.getTileGroup().getTiles().add(tile);
-        }
-
-        return savePlayerTileList(playerTileList);
+        return playerTileRepository.saveAll(playerTileList);
     }
 
     @Override
@@ -142,7 +159,7 @@ public class TileServiceImpl implements TileService {
             exposedTiles.add(tile);
             tile.setTileGroup(playerTile.getExposedTiles());
 
-            drawTile(playerTile, wallTileGroup, false);
+            drawTile(playerTile, wallTileGroup);
 
             boardTileRepository.save(tile);
         }
@@ -153,17 +170,25 @@ public class TileServiceImpl implements TileService {
     }
 
     @Override
-    public boolean drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {
+    public BoardTile drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup) {
+
+        return drawTileFromWall(playerTile, wallTileGroup, true);
+    }
+
+    @Override
+    public BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
+
+        return drawTileFromWall(playerTile, wallTileGroup, false);
+    }
+
+    private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {
 
         List<BoardTile> wallTiles = wallTileGroup.getTiles();
-
         BoardTile tile = wallTiles.remove(isFromHead ? 0 : wallTiles.size() - 1);
         tile.setTileGroup(playerTile.getHandTiles());
         playerTile.getHandTiles().getTiles().add(0, tile);
 
-        boardTileRepository.save(tile);
-
-        return tile.isFlower();
+        return boardTileRepository.save(tile);
     }
 
     private int getFirstTileIndex(Integer diceNumber) {

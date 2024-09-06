@@ -37,18 +37,32 @@ public class Hand {
     @Column(name = "status")
     private HandStatus status;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "round_id", referencedColumnName = "id")
     private Round round;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "dealer_id", referencedColumnName = "id")
     private GamePlayer dealer;
 
-    @OneToOne(mappedBy = "hand")
+    @OneToOne(
+            mappedBy = "hand",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     private WallTileGroup wallTileGroup;
 
-    @OneToMany(mappedBy = "hand", fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "hand",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     private List<PlayerTile> playerTiles;
 
     @Enumerated(EnumType.STRING)
@@ -58,11 +72,17 @@ public class Hand {
     @Column(name = "dice_number")
     private Integer diceNumber;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "winner_id", referencedColumnName = "id")
     private GamePlayer winner;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
+    )
     @JoinColumn(name = "chucker_id", referencedColumnName = "id")
     private GamePlayer chucker;
 
