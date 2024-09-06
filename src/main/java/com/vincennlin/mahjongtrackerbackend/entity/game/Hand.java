@@ -99,4 +99,15 @@ public class Hand {
         }
         return isExtraHand ? dealer : dealer.getDownwindPlayer();
     }
+
+    public PlayerTile getPlayerTileByGamePlayer(GamePlayer gamePlayer) {
+        return playerTiles.stream()
+                .filter(playerTile -> playerTile.getGamePlayer().equals(gamePlayer))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public GamePlayer getGamePlayerByUserId(Long userId) {
+        return round.getGame().getGamePlayerByUserId(userId);
+    }
 }

@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.controller.game;
 
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,14 @@ public class HandController {
         BoardDto boardDto = handService.getBoardByGameId(gameId);
 
         return new ResponseEntity<>(boardDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/games/{game_id}/current-player-view")
+    public ResponseEntity<PlayerViewDto> getCurrentPlayerViewByGameId(@PathVariable(name = "game_id") Long gameId) {
+
+        PlayerViewDto playerViewDto = handService.getCurrentPlayerViewByGameId(gameId);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
     }
 
     @PostMapping("/games/{game_id}/hands")

@@ -13,6 +13,7 @@ import com.vincennlin.mahjongtrackerbackend.mapper.game.BoardMapper;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.HandMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.RoundStatus;
@@ -21,6 +22,7 @@ import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
 import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
 import com.vincennlin.mahjongtrackerbackend.service.game.RoundService;
 import com.vincennlin.mahjongtrackerbackend.service.game.TileService;
+import com.vincennlin.mahjongtrackerbackend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class HandServiceImpl implements HandService {
     private final HandMapper handMapper;
     private final BoardMapper boardMapper;
 
+    private final UserService  userService;
     private final GameService gameService;
     private final RoundService roundService;
     private final TileService tileService;
@@ -69,6 +72,17 @@ public class HandServiceImpl implements HandService {
         tileService.sortHandGroupTiles(hand.getPlayerTiles());
 
         return boardMapper.mapToDto(hand);
+    }
+
+    @Override
+    public PlayerViewDto getCurrentPlayerViewByGameId(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        GamePlayer currentGamePlayer = hand.getGamePlayerByUserId(userService.getCurrentUserId());
+        currentGamePlayer.getPlayerTile().getHandTiles().sortHandTiles();
+
+        return boardMapper.mapToPlayerViewDto(hand, currentGamePlayer);
     }
 
     @Override

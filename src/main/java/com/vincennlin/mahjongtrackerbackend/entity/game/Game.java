@@ -81,12 +81,8 @@ public class Game {
     private LocalDateTime dateCreated;
 
     public boolean containsPlayerById(Long playerId) {
-        for (GamePlayer gamePlayer : gamePlayers) {
-            if (gamePlayer.getPlayer().getId().equals(playerId)) {
-                return true;
-            }
-        }
-        return false;
+        return gamePlayers.stream()
+                .anyMatch(gamePlayer -> gamePlayer.getPlayer().getId().equals(playerId));
     }
 
     public Wind getNextRoundWind() {
@@ -105,5 +101,12 @@ public class Game {
 
     public Hand getCurrentHand() {
         return getCurrentRound().getCurrentHand();
+    }
+
+    public GamePlayer getGamePlayerByUserId(Long userId) {
+        return gamePlayers.stream()
+                .filter(gamePlayer -> gamePlayer.getPlayer().getId().equals(userId))
+                .findFirst()
+                .orElse(null);
     }
 }

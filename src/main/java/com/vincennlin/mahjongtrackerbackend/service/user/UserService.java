@@ -16,6 +16,8 @@ public interface UserService extends UserDetailsService {
 
     UserDto getUserByUserId(Long userId);
 
+    Long getCurrentUserId();
+
     AccountInfoDto getCurrentAccountInfo();
 
 //    byte[] getProfilePicture();

@@ -4,6 +4,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ public interface HandService {
     Hand getHandEntityById(Long handId);
 
     BoardDto getBoardByGameId(Long gameId);
+
+    PlayerViewDto getCurrentPlayerViewByGameId(Long gameId);
 
     List<PlayerTile> getPlayerTileEntityListByGameId(Long gameId);
 

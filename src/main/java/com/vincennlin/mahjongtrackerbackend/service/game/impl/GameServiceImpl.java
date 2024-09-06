@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
 import com.vincennlin.mahjongtrackerbackend.exception.ProcessException;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
@@ -63,6 +64,20 @@ public class GameServiceImpl implements GameService {
         authorizeOwnershipByGameCreatorId(game.getCreator().getId());
 
         return game;
+    }
+
+    @Override
+    public GamePlayer getGamePlayerEntityByUserId(Long gameId, Long currentUserId) {
+
+        Game game = getGameEntityById(gameId);
+
+        List<GamePlayer> gamePlayers = game.getGamePlayers();
+
+        return gamePlayers.stream().filter(
+                gamePlayer ->
+                        gamePlayer.getPlayer().getType() == PlayerType.HUMAN && gamePlayer.getPlayer().getId().equals(currentUserId)
+        ).findFirst().orElseThrow(
+                () -> new ResourceNotFoundException("GamePlayer", "game id and player id", gameId));
     }
 
     @Transactional

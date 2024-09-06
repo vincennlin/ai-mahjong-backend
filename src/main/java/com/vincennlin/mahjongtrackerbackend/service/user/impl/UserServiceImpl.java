@@ -125,6 +125,11 @@ public class UserServiceImpl implements UserService {
 //    }
 
     @Override
+    public Long getCurrentUserId() {
+        return Long.parseLong(getAuthentication().getPrincipal().toString());
+    }
+
+    @Override
     public AccountInfoDto getCurrentAccountInfo() {
 
         Long currentUserId = getCurrentUserId();
@@ -236,10 +241,6 @@ public class UserServiceImpl implements UserService {
 
     private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
-    }
-
-    private Long getCurrentUserId() {
-        return Long.parseLong(getAuthentication().getPrincipal().toString());
     }
 
     private void authorizeByUserId(Long userId) {
