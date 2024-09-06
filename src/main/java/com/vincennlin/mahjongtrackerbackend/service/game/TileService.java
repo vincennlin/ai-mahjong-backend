@@ -17,9 +17,13 @@ public interface TileService {
 
 //    List<PlayerTile> savePlayerTileList(List<PlayerTile> playerTileList);
 
+    int getFirstTileIndex(Integer diceNumber);
+
     List<PlayerTile> dealTiles(Hand hand);
 
     void sortHandGroupTiles(List<PlayerTile> playerTileList);
+
+    void reorderWallTiles(int diceNumber, WallTileGroup wallTileGroup);
 
     void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
 

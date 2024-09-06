@@ -147,6 +147,12 @@ public class HandServiceImpl implements HandService {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
+        if (hand.getStatus() != HandStatus.READY_TO_DEAL_TILES) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in ready to deal state");
+        }
+
+        tileService.reorderWallTiles(tileService.getFirstTileIndex(hand.getDiceNumber()), hand.getWallTileGroup());
+
         List<PlayerTile> playerTilesList = tileService.dealTiles(hand);
 
         hand.setPlayerTiles(playerTilesList);
@@ -162,7 +168,13 @@ public class HandServiceImpl implements HandService {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
+        if (hand.getStatus() != HandStatus.FINISHED_DEALING) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in finished dealing state");
+        }
+
         tileService.drawTile(hand.getDealer().getPlayerTile(), hand.getWallTileGroup());
+
+        hand.setStatus(HandStatus.FINISHED_BREAKING_WALL);
 
         return boardMapper.mapToDto(handRepository.save(hand));
     }
@@ -171,6 +183,10 @@ public class HandServiceImpl implements HandService {
     public BoardDto initialFoulHand(Long gameId) {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.FINISHED_BREAKING_WALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in finished breaking wall state");
+        }
 
         GamePlayer currentPlayer = getCurrentHandEntityByGameId(gameId).getDealer();
 
@@ -187,6 +203,8 @@ public class HandServiceImpl implements HandService {
         }
 
         tileService.sortHandGroupTiles(hand.getPlayerTiles());
+
+        hand.setStatus(HandStatus.IN_PROGRESS);
 
         return boardMapper.mapToDto(handRepository.save(hand));
     }

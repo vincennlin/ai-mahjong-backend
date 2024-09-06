@@ -42,7 +42,7 @@ public enum Tile implements TileInterface, Comparable<Tile> {
     WIND_WEST("西風", 3, TileType.HONOR),
     WIND_NORTH("北風", 4, TileType.HONOR),
     DRAGON_RED("紅中", 1, TileType.HONOR),
-    DRAGON_GREEN("青發", 2, TileType.HONOR),
+    DRAGON_GREEN("發財", 2, TileType.HONOR),
     DRAGON_WHITE("白板", 3, TileType.HONOR),
 
     SEASON_SPRING("春", 1, TileType.FLOWER),
@@ -51,8 +51,8 @@ public enum Tile implements TileInterface, Comparable<Tile> {
     SEASON_WINTER("冬", 4, TileType.FLOWER),
     FLOWER_PLUM("梅", 1, TileType.FLOWER),
     FLOWER_ORCHID("蘭", 2, TileType.FLOWER),
-    FLOWER_CHRYSANTHEMUM("菊", 3, TileType.FLOWER),
-    FLOWER_BAMBOO("竹", 4, TileType.FLOWER);
+    FLOWER_BAMBOO("竹", 3, TileType.FLOWER),
+    FLOWER_CHRYSANTHEMUM("菊", 4, TileType.FLOWER);
 
     private final String name;
     private final int rank;

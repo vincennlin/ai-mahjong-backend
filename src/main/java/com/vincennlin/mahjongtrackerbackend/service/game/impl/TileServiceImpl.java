@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -113,15 +114,30 @@ public class TileServiceImpl implements TileService {
 //    }
 
     @Override
+    public int getFirstTileIndex(Integer diceNumber) {
+
+        int direction = diceNumber % DefaultGameConstants.DEFAULT_PLAYER_COUNT;
+
+        int firstTileIndex = switch (direction) {
+            case 1 -> 0;
+            case 2 -> 108;
+            case 3 -> 72;
+            case 0 -> 36;
+            default -> throw new InternalGameError(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid dice number");
+        };
+
+        firstTileIndex += diceNumber * 2;
+
+        return firstTileIndex;
+    }
+
+    @Override
     public List<PlayerTile> dealTiles(Hand hand) {
 
         WallTileGroup wallTileGroup = hand.getWallTileGroup();
         List<BoardTile> wallTiles = wallTileGroup.getTiles();
-        Integer diceNumber = hand.getDiceNumber();
 
         List<PlayerTile> playerTileList = createPlayerTileList(hand);
-
-        int currentTileIndex = getFirstTileIndex(diceNumber);
 
         GamePlayer currentPlayer = hand.getDealer();
 
@@ -129,8 +145,7 @@ public class TileServiceImpl implements TileService {
             for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
                 HandTileGroup handTileGroup = playerTileList.get(i).getHandTiles();
                 for (int j = 0; j < 4; j++) {
-                    if (currentTileIndex > wallTiles.size() - 1) currentTileIndex = 0;
-                    BoardTile tile = wallTiles.remove(currentTileIndex);
+                    BoardTile tile = wallTiles.remove(0);
                     tile.setTileGroup(handTileGroup);
                     tile.getTileGroup().getTiles().add(tile);
                 }
@@ -149,6 +164,24 @@ public class TileServiceImpl implements TileService {
     }
 
     @Override
+    public void reorderWallTiles(int index, WallTileGroup wallTileGroup) {
+
+        List<BoardTile> wallTiles = wallTileGroup.getTiles();
+
+        List<Tile> originalTileTypes = wallTiles.stream()
+                .map(BoardTile::getTile)
+                .collect(Collectors.toList());
+
+        Collections.rotate(originalTileTypes, -index);
+
+        for (int i = 0; i < wallTiles.size(); i++) {
+            wallTiles.get(i).setTile(originalTileTypes.get(i));
+        }
+
+        wallTileGroupRepository.save(wallTileGroup);
+    }
+
+    @Override
     public void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
         List<BoardTile> handTiles = playerTile.getHandTiles().getTiles();
@@ -159,7 +192,7 @@ public class TileServiceImpl implements TileService {
             exposedTiles.add(tile);
             tile.setTileGroup(playerTile.getExposedTiles());
 
-            drawTile(playerTile, wallTileGroup);
+            foulHand(playerTile, wallTileGroup);
 
             boardTileRepository.save(tile);
         }
@@ -189,22 +222,5 @@ public class TileServiceImpl implements TileService {
         playerTile.getHandTiles().getTiles().add(0, tile);
 
         return boardTileRepository.save(tile);
-    }
-
-    private int getFirstTileIndex(Integer diceNumber) {
-
-        int direction = diceNumber % DefaultGameConstants.DEFAULT_PLAYER_COUNT;
-
-        int firstTileIndex = switch (direction) {
-            case 1 -> 0;
-            case 2 -> 108;
-            case 3 -> 72;
-            case 0 -> 36;
-            default -> throw new InternalGameError(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid dice number");
-        };
-
-        firstTileIndex += diceNumber * 2;
-
-        return firstTileIndex;
     }
 }
