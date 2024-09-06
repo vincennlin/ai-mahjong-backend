@@ -11,6 +11,8 @@ public interface GamePlayerService {
 
     GamePlayer getGamePlayerEntityByPlayerId(Long playerId);
 
+    GamePlayer getGamePlayerEntityByGameAndUserId(Game game, Long currentUserId);
+
     GamePlayer createGamePlayerAndGetEntity(Game game, Player player);
 
     void deleteGamePlayerById(Long gamePlayerId);

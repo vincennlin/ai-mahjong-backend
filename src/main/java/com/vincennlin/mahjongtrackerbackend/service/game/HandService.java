@@ -33,4 +33,6 @@ public interface HandService {
     BoardDto breakWall(Long gameId);
 
     BoardDto initialFoulHand(Long gameId);
+
+    BoardDto discardTile(Long gameId, Long gamePlayerId, Long boardTileId);
 }

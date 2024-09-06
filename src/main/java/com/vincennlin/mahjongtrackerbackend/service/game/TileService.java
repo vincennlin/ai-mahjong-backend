@@ -30,4 +30,6 @@ public interface TileService {
     BoardTile drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup);
 
     BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
+
+    BoardTile discardTile(PlayerTile playerTile, Long boardTileId);
 }

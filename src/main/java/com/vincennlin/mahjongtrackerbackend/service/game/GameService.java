@@ -1,7 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.service.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
-import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
@@ -14,8 +13,6 @@ public interface GameService {
     GameDto getGameById(Long gameId);
 
     Game getGameEntityById(Long gameId);
-
-    GamePlayer getGamePlayerEntityByUserId(Long gameId, Long currentUserId);
 
     GameDto createGame(CreateGameRequest request);
 

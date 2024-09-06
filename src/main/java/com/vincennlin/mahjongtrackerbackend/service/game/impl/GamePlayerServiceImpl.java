@@ -6,11 +6,14 @@ import com.vincennlin.mahjongtrackerbackend.entity.game.Player;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.GamePlayerMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GamePlayerDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GamePlayerRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -34,6 +37,18 @@ public class GamePlayerServiceImpl implements GamePlayerService {
 
         return gamePlayerRepository.getGamePlayerByPlayerId(playerId).orElseThrow(
                 () -> new ResourceNotFoundException("GamePlayer", "player id", playerId));
+    }
+
+    @Override
+    public GamePlayer getGamePlayerEntityByGameAndUserId(Game game, Long currentUserId) {
+
+        List<GamePlayer> gamePlayers = game.getGamePlayers();
+
+        return gamePlayers.stream().filter(
+                gamePlayer ->
+                        gamePlayer.getPlayer().getType() == PlayerType.HUMAN && gamePlayer.getPlayer().getUser().getId().equals(currentUserId)
+        ).findFirst().orElseThrow(
+                () -> new ResourceNotFoundException("GamePlayer", "game id and player id", game.getId()));
     }
 
     @Transactional

@@ -25,6 +25,7 @@ public class Hand {
     public Hand(Round round, GamePlayer dealer, Wind prevailingWind) {
         this.round = round;
         this.dealer = dealer;
+        this.activeGamePlayer = dealer;
         this.prevailingWind = prevailingWind;
         this.status = HandStatus.READY_TO_INITIALIZE_WALL_TILES;
     }
@@ -71,6 +72,13 @@ public class Hand {
 
     @Column(name = "dice_number")
     private Integer diceNumber;
+
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
+    )
+    @JoinColumn(name = "active_game_player_id", referencedColumnName = "id")
+    private GamePlayer activeGamePlayer;
 
     @ManyToOne(
             fetch = FetchType.EAGER,

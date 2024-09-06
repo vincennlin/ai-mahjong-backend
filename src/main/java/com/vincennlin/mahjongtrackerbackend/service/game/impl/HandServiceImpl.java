@@ -18,10 +18,7 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.RoundStatus;
 import com.vincennlin.mahjongtrackerbackend.repository.game.HandRepository;
-import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
-import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
-import com.vincennlin.mahjongtrackerbackend.service.game.RoundService;
-import com.vincennlin.mahjongtrackerbackend.service.game.TileService;
+import com.vincennlin.mahjongtrackerbackend.service.game.*;
 import com.vincennlin.mahjongtrackerbackend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,6 +37,7 @@ public class HandServiceImpl implements HandService {
     private final GameService gameService;
     private final RoundService roundService;
     private final TileService tileService;
+    private final GamePlayerService gamePlayerService;
 
     private final HandRepository handRepository;
 
@@ -216,10 +214,44 @@ public class HandServiceImpl implements HandService {
             }
         }
 
-        tileService.sortHandGroupTiles(hand.getPlayerTiles());
-
-        hand.setStatus(HandStatus.IN_PROGRESS);
+        hand.setStatus(HandStatus.WAITING_FOR_DISCARD);
 
         return boardMapper.mapToDto(handRepository.save(hand));
+    }
+
+    @Override
+    public BoardDto discardTile(Long gameId, Long gamePlayerId, Long boardTileId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_DISCARD) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for discard state");
+        }
+
+        GamePlayer gamePlayer = null;
+
+        if (gamePlayerId == null) {
+            gamePlayer = gamePlayerService.getGamePlayerEntityByGameAndUserId(hand.getRound().getGame(), userService.getCurrentUserId());
+        } else {
+            gamePlayer = getGamePlayerByGameAndGamePlayerId(hand.getRound().getGame(), gamePlayerId);
+        }
+
+        if (hand.getActiveGamePlayer() != gamePlayer) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "It is not the current player's turn");
+        }
+
+        tileService.discardTile(gamePlayer.getPlayerTile(), boardTileId);
+
+        hand.setStatus(HandStatus.WAITING_FOR_CALL);
+
+        return boardMapper.mapToDto(handRepository.save(hand));
+    }
+
+    private GamePlayer getGamePlayerByGameAndGamePlayerId(Game game, Long gamePlayerId) {
+        GamePlayer gamePlayer = gamePlayerService.getGamePlayerEntityByPlayerId(gamePlayerId);
+        if (gamePlayer.getGame() != game) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, game.getCurrentHand().getStatus(), "GamePlayer does not belong to the game");
+        }
+        return gamePlayer;
     }
 }

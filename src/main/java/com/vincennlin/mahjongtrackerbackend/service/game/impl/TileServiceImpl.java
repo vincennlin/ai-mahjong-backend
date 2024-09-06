@@ -7,6 +7,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.*;
 import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
+import com.vincennlin.mahjongtrackerbackend.exception.WebAPIException;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import com.vincennlin.mahjongtrackerbackend.repository.game.*;
 import com.vincennlin.mahjongtrackerbackend.service.game.TileService;
@@ -212,6 +213,22 @@ public class TileServiceImpl implements TileService {
     public BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
         return drawTileFromWall(playerTile, wallTileGroup, false);
+    }
+
+    @Override
+    public BoardTile discardTile(PlayerTile playerTile, Long boardTileId) {
+
+        BoardTile boardTile = boardTileRepository.findById(boardTileId)
+                .orElseThrow(() -> new WebAPIException(HttpStatus.BAD_REQUEST, "Tile is not found"));
+
+        if (!playerTile.getHandTiles().getTiles().remove(boardTile)) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Tile is not in player's hand");
+        }
+
+        playerTile.getDiscardedTiles().getTiles().add(boardTile);
+        boardTile.setTileGroup(playerTile.getDiscardedTiles());
+
+        return boardTileRepository.save(boardTile);
     }
 
     private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {

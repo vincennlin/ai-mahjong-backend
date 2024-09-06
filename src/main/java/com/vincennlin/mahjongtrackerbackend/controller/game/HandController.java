@@ -87,4 +87,23 @@ public class HandController {
 
         return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
+
+    @PostMapping("/games/{game_id}/discard/{board_tile_id}")
+    public ResponseEntity<BoardDto> discardTile(@PathVariable(name = "game_id") Long gameId,
+                                                @PathVariable(name = "board_tile_id") Long boardTileId) {
+
+        BoardDto boardDto = handService.discardTile(gameId, null, boardTileId);
+
+        return new ResponseEntity<>(boardDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/games/{game_id}/game-players/{game_player_id}/discard/{board_tile_id}")
+    public ResponseEntity<BoardDto> discardTileByGamePlayerId(@PathVariable(name = "game_id") Long gameId,
+                                                @PathVariable(name = "game_player_id") Long gamePlayerId,
+                                                @PathVariable(name = "board_tile_id") Long boardTileId) {
+
+        BoardDto boardDto = handService.discardTile(gameId, gamePlayerId, boardTileId);
+
+        return new ResponseEntity<>(boardDto, HttpStatus.OK);
+    }
 }
