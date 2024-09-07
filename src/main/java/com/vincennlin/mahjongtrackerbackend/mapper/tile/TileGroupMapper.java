@@ -38,6 +38,20 @@ public class TileGroupMapper {
         return wallTileGroupDto;
     }
 
+    public PlayerTileGroupDto mapPlayerTileGroupToStringDto(PlayerTileGroup playerTileGroup) {
+        PlayerTileGroupDto playerTileGroupDto = modelMapper.map(playerTileGroup, PlayerTileGroupDto.class);
+        String[] tilesString = playerTileGroup.convertTilesToString();
+        playerTileGroupDto.setTilesNum(tilesString[0]);
+        playerTileGroupDto.setTilesSub(tilesString[1]);
+        playerTileGroupDto.setTileCount(playerTileGroup.getTiles().size());
+
+//        playerTileGroupDto.setTiles(null);
+        playerTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(playerTileGroup.getTiles()));
+
+        playerTileGroupDto.setPlayerId(playerTileGroup.getPlayerId());
+        return playerTileGroupDto;
+    }
+
     public PlayerTileGroupDto mapPlayerTileGroupToDto(PlayerTileGroup playerTileGroup) {
         PlayerTileGroupDto playerTileGroupDto = modelMapper.map(playerTileGroup, PlayerTileGroupDto.class);
         playerTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(playerTileGroup.getTiles()));
@@ -50,9 +64,14 @@ public class TileGroupMapper {
         PlayerTileDto playerTileDto = modelMapper.map(playerTile, PlayerTileDto.class);
         playerTileDto.setHandId(playerTile.getHand().getId());
         playerTileDto.setGamePlayerId(playerTile.getGamePlayer().getId());
-        playerTileDto.setHandTiles(mapPlayerTileGroupToDto(playerTile.getHandTiles()));
-        playerTileDto.setExposedTiles(mapPlayerTileGroupToDto(playerTile.getExposedTiles()));
-        playerTileDto.setDiscardedTiles(mapPlayerTileGroupToDto(playerTile.getDiscardedTiles()));
+
+//        playerTileDto.setHandTiles(mapPlayerTileGroupToDto(playerTile.getHandTiles()));
+//        playerTileDto.setExposedTiles(mapPlayerTileGroupToDto(playerTile.getExposedTiles()));
+//        playerTileDto.setDiscardedTiles(mapPlayerTileGroupToDto(playerTile.getDiscardedTiles()));
+
+        playerTileDto.setHandTiles(mapPlayerTileGroupToStringDto(playerTile.getHandTiles()));
+        playerTileDto.setExposedTiles(mapPlayerTileGroupToStringDto(playerTile.getExposedTiles()));
+        playerTileDto.setDiscardedTiles(mapPlayerTileGroupToStringDto(playerTile.getDiscardedTiles()));
         return playerTileDto;
     }
 }

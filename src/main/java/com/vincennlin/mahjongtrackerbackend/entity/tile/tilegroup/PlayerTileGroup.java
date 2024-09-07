@@ -11,4 +11,6 @@ public interface PlayerTileGroup {
     List<BoardTile> getTiles();
 
     Long getPlayerId();
+
+    String[] convertTilesToString();
 }

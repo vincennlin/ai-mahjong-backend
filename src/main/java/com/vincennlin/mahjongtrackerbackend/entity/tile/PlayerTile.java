@@ -54,4 +54,8 @@ public class PlayerTile {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
     )
     private DiscardedTileGroup discardedTiles;
+
+    public String[] convertTilesToString(TileGroup tileGroup) {
+        return tileGroup.convertTilesToString();
+    }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.WallTileGroupDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.HandOperation;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,9 @@ public class PlayerViewDto {
 
     @JsonProperty(value = "prevailing_wind")
     private Wind prevailingWind;
+
+    @JsonProperty(value = "status")
+    private HandStatus status;
 
     @JsonProperty(value = "acceptable_operations")
     private Set<HandOperation> acceptableOperations;

@@ -6,6 +6,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.mapper.tile.TileGroupMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -48,12 +49,21 @@ public class BoardMapper {
     public PlayerViewDto mapToPlayerViewDto(Hand hand, GamePlayer gamePlayer) {
         PlayerViewDto playerViewDto = new PlayerViewDto();
         playerViewDto.setHandId(hand.getId());
+        playerViewDto.setStatus(hand.getStatus());
         playerViewDto.setAcceptableOperations(hand.getStatus().getAcceptableOperations());
         playerViewDto.setRoundWind(hand.getRound().getRoundWind());
         playerViewDto.setPrevailingWind(hand.getPrevailingWind());
 
         playerViewDto.setWallTiles(tileGroupMapper.mapWallTileGroupToDto(hand.getWallTileGroup()));
         playerViewDto.getWallTiles().setTiles(null);
+
+        if (hand.getPlayerTiles() != null) {
+            for (PlayerTile playerTile : hand.getPlayerTiles()) {
+                if (hand.getStatus() != HandStatus.FINISHED_DEALING && hand.getStatus() != HandStatus.FINISHED_BREAKING_WALL) {
+                    playerTile.getHandTiles().sortHandTiles();
+                }
+            }
+        }
 
         playerViewDto.setPlayerTile(tileGroupMapper.mapPlayerTileToDto(hand.getPlayerTileByGamePlayer(gamePlayer)));
 
