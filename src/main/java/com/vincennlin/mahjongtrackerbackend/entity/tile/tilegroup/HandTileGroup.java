@@ -46,27 +46,61 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         return (int) getTiles().stream().filter(boardTile -> boardTile.getTile().equals(tile)).count();
     }
 
+    private boolean hasTile(Tile tile) {
+        if (tile == null) return false;
+        return getCountForTile(tile) > 0;
+    }
+
     public boolean containsFlowerTile() {
         return getTiles().stream().anyMatch(BoardTile::isFlower);
     }
 
     public boolean canCall(GamePlayer discardGamePlayer, Tile tile) {
-        return canCallChow(discardGamePlayer, tile) || canCallPong(tile) || canCallKong(tile);
+        return canCallChow(discardGamePlayer, tile) || canCallPong(discardGamePlayer, tile) || canCallKong(discardGamePlayer, tile);
     }
 
     public boolean canCallChow(GamePlayer discardGamePlayer, Tile tile) {
-        if (discardGamePlayer != getPlayerTile().getGamePlayer().getUpwindPlayer() || !tile.isSuit()) {
+        GamePlayer currentPlayer = getPlayerTile().getGamePlayer();
+        if (currentPlayer == discardGamePlayer || discardGamePlayer != getPlayerTile().getGamePlayer().getUpwindPlayer() || !tile.isSuit()) {
             return false;
         }
-        return getCountForTile(tile.getPreviousTile()) >= 1 && getCountForTile(tile.getNextTile()) >= 1;
+        return canCallDoubleSidedChow(tile) || canCallEdgeChow(tile) || canCallInsideStraightChow(tile);
     }
 
-    public boolean canCallPong(Tile tile) {
+    public boolean canCallInsideStraightChow(Tile tile) {
+        if (tile.getRank() < 2 || tile.getRank() > 8) {
+            return false;
+        }
+        return hasTile(tile.getPreviousTile()) && hasTile(tile.getNextTile());
+    }
+
+    public boolean canCallEdgeChow(Tile tile) {
+        if (tile.getRank() != 3 && tile.getRank() != 7) {
+            return false;
+        }
+        return (tile.getRank() == 3 && hasTile(tile.getPreviousTile()) && hasTile(tile.getPreviousTile().getPreviousTile()) ||
+                (tile.getRank() == 7 && hasTile(tile.getNextTile()) && hasTile(tile.getNextTile().getNextTile())));
+    }
+
+    public boolean canCallDoubleSidedChow(Tile tile) {
+        return (tile.getRank() > 2 && (tile.getPreviousTile() != null  && hasTile(tile.getPreviousTile()) && hasTile(tile.getPreviousTile().getPreviousTile()) ||
+                (tile.getRank() < 8 && (tile.getNextTile() != null  && hasTile(tile.getNextTile()) && hasTile(tile.getNextTile().getNextTile())))));
+    }
+
+    public boolean canCallPong(GamePlayer discardGamePlayer, Tile tile) {
+        GamePlayer currentPlayer = getPlayerTile().getGamePlayer();
+        if (currentPlayer == discardGamePlayer) {
+            return false;
+        }
         return getCountForTile(tile) >= 2;
     }
 
-    public boolean canCallKong(Tile tile) {
-        return getCountForTile(tile) >= 3;
+    public boolean canCallKong(GamePlayer discardGamePlayer,Tile tile) {
+        GamePlayer currentPlayer = getPlayerTile().getGamePlayer();
+        if (currentPlayer == discardGamePlayer) {
+            return false;
+        }
+        return getCountForTile(tile) == 3;
     }
 
     public boolean canConcealedKong() {

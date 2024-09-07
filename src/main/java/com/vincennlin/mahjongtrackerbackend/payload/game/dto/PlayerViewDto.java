@@ -28,6 +28,9 @@ public class PlayerViewDto {
     @JsonProperty(value = "prevailing_wind")
     private Wind prevailingWind;
 
+    @JsonProperty(value = "active_game_player_id")
+    private Long activeGamePlayerId;
+
     @JsonProperty(value = "status")
     private HandStatus status;
 

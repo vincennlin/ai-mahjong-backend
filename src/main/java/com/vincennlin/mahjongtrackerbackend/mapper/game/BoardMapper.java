@@ -47,6 +47,7 @@ public class BoardMapper {
     public PlayerViewDto mapToPlayerViewDto(Hand hand, GamePlayer gamePlayer) {
         PlayerViewDto playerViewDto = new PlayerViewDto();
         playerViewDto.setHandId(hand.getId());
+        playerViewDto.setActiveGamePlayerId(hand.getActiveGamePlayer().getId());
         playerViewDto.setStatus(hand.getStatus());
         playerViewDto.setAcceptableOperations(hand.getStatus().getAcceptableOperations());
         playerViewDto.setRoundWind(hand.getRound().getRoundWind());
