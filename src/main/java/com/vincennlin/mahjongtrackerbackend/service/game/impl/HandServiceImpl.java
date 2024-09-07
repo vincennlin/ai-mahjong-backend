@@ -303,9 +303,10 @@ public class HandServiceImpl implements HandService {
                     return playerTile.getGamePlayer().getStatus() == GamePlayerStatus.WAITING;
                 })) {
             hand.setStatus(HandStatus.WAITING_FOR_DRAW);
+            gamePlayerService.setGamePlayerStatus(hand.getActiveGamePlayer().getDownwindPlayer(), GamePlayerStatus.ABLE_TO_DRAW_TILE);
         }
 
-        return boardMapper.mapToPlayerViewDto(hand, gamePlayer);
+        return boardMapper.mapToPlayerViewDto(handRepository.save(hand), gamePlayer);
     }
 
     private GamePlayer getGamePlayerByGameAndGamePlayerId(Game game, Long gamePlayerId) {

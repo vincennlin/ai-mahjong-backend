@@ -126,16 +126,21 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     }
 
     public Set<GamePlayerOperation> getAcceptableOperations() {
-        Set<GamePlayerOperation> acceptableOperations = new HashSet<>();
+        Set<GamePlayerOperation> newAcceptableOperations = new HashSet<>();
         Hand hand = getPlayerTile().getHand();
-        for (GamePlayerOperation operation : getGamePlayer().getStatus().getAcceptableOperations()) {
-            if (operation == GamePlayerOperation.CALL_FOR_CHOW  && canCallChow(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
-                    || operation == GamePlayerOperation.CALL_FOR_PONG && canCallPong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
-                    || operation == GamePlayerOperation.CALL_FOR_EXPOSED_KONG && canCallKong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
-            ) {
-                acceptableOperations.add(operation);
+        Set<GamePlayerOperation> acceptableOperations = getGamePlayer().getStatus().getAcceptableOperations();
+        for (GamePlayerOperation operation : acceptableOperations) {
+            if (operation == GamePlayerOperation.CALL_FOR_CHOW || operation == GamePlayerOperation.CALL_FOR_PONG || operation == GamePlayerOperation.CALL_FOR_EXPOSED_KONG) {
+                if (operation == GamePlayerOperation.CALL_FOR_CHOW  && canCallChow(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
+                        || operation == GamePlayerOperation.CALL_FOR_PONG && canCallPong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
+                        || operation == GamePlayerOperation.CALL_FOR_EXPOSED_KONG && canCallKong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
+                ) {
+                    newAcceptableOperations.add(operation);
+                }
+            } else {
+                newAcceptableOperations.addAll(acceptableOperations);
             }
         }
-        return acceptableOperations;
+        return newAcceptableOperations;
     }
 }

@@ -115,4 +115,13 @@ public class HandController {
 
         return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
+
+    @PostMapping("/games/{game_id}/game-players/{game_player_id}/cancel-for-call")
+    public ResponseEntity<PlayerViewDto> cancelForCall(@PathVariable(name = "game_id") Long gameId,
+                                                @PathVariable(name = "game_player_id") Long gamePlayerId) {
+
+        PlayerViewDto playerViewDto = handService.cancelForCall(gameId, gamePlayerId);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
 }
