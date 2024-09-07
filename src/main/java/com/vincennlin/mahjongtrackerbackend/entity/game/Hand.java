@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
@@ -80,6 +81,13 @@ public class Hand {
     @JoinColumn(name = "active_game_player_id", referencedColumnName = "id")
     private GamePlayer activeGamePlayer;
 
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
+    )
+    @JoinColumn(name = "last_discarded_tile_id", referencedColumnName = "id")
+    private BoardTile lastDiscardedTile;
+
     @ManyToOne(
             fetch = FetchType.EAGER,
             cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}
@@ -117,5 +125,9 @@ public class Hand {
 
     public GamePlayer getGamePlayerByUserId(Long userId) {
         return round.getGame().getGamePlayerByUserId(userId);
+    }
+
+    public GamePlayer getGamePlayerInGame(GamePlayer gamePlayer) {
+        return round.getGame().getGamePlayerInGame(gamePlayer);
     }
 }

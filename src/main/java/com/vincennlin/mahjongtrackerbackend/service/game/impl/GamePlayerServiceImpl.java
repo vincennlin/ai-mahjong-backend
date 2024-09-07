@@ -7,6 +7,7 @@ import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.GamePlayerMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GamePlayerDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GamePlayerRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
 import lombok.AllArgsConstructor;
@@ -61,9 +62,15 @@ public class GamePlayerServiceImpl implements GamePlayerService {
     @Override
     public GamePlayer createGamePlayerAndGetEntity(Game game, Player player) {
 
-        GamePlayer gamePlayer = new GamePlayer();
-        gamePlayer.setGame(game);
-        gamePlayer.setPlayer(player);
+        GamePlayer gamePlayer = new GamePlayer(game, player);
+
+        return gamePlayerRepository.save(gamePlayer);
+    }
+
+    @Override
+    public GamePlayer setGamePlayerStatus(GamePlayer gamePlayer, GamePlayerStatus status) {
+
+        gamePlayer.setStatus(status);
 
         return gamePlayerRepository.save(gamePlayer);
     }

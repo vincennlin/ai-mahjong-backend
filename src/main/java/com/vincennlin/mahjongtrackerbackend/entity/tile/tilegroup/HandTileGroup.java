@@ -1,14 +1,20 @@
 package com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
+import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
+import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.TileComparator;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -35,6 +41,10 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         return playerTile.getGamePlayer().getId();
     }
 
+    public GamePlayer getGamePlayer() {
+        return playerTile.getGamePlayer();
+    }
+
     public void sortHandTiles() {
         getTiles().sort(new TileComparator());
     }
@@ -56,11 +66,19 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     }
 
     public boolean canCall(GamePlayer discardGamePlayer, Tile tile) {
-        return canCallChow(discardGamePlayer, tile) || canCallPong(discardGamePlayer, tile) || canCallKong(discardGamePlayer, tile);
+        GamePlayer currentPlayer = getGamePlayer();
+        if (currentPlayer == discardGamePlayer) {
+            return false;
+        }
+        if (canCallChow(discardGamePlayer, tile) || canCallPong(discardGamePlayer, tile) || canCallKong(discardGamePlayer, tile)) {
+            getGamePlayer().setStatus(GamePlayerStatus.THINKING_FOR_CALL);
+            return true;
+        }
+        return false;
     }
 
     public boolean canCallChow(GamePlayer discardGamePlayer, Tile tile) {
-        GamePlayer currentPlayer = getPlayerTile().getGamePlayer();
+        GamePlayer currentPlayer = getGamePlayer();
         if (currentPlayer == discardGamePlayer || discardGamePlayer != getPlayerTile().getGamePlayer().getUpwindPlayer() || !tile.isSuit()) {
             return false;
         }
@@ -105,5 +123,19 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
 
     public boolean canConcealedKong() {
         return getTiles().stream().anyMatch(boardTile -> getCountForTile(boardTile.getTile()) == 4);
+    }
+
+    public Set<GamePlayerOperation> getAcceptableOperations() {
+        Set<GamePlayerOperation> acceptableOperations = new HashSet<>();
+        Hand hand = getPlayerTile().getHand();
+        for (GamePlayerOperation operation : getGamePlayer().getStatus().getAcceptableOperations()) {
+            if (operation == GamePlayerOperation.CALL_FOR_CHOW  && canCallChow(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
+                    || operation == GamePlayerOperation.CALL_FOR_PONG && canCallPong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
+                    || operation == GamePlayerOperation.CALL_FOR_EXPOSED_KONG && canCallKong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
+            ) {
+                acceptableOperations.add(operation);
+            }
+        }
+        return acceptableOperations;
     }
 }

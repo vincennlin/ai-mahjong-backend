@@ -1,6 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.payload.game.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.BoardTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.WallTileGroupDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.HandOperation;
@@ -34,6 +35,9 @@ public class BoardDto {
 
     @JsonProperty(value = "active_game_player_id")
     private Long activeGamePlayerId;
+
+    @JsonProperty(value = "last_discarded_tile")
+    private BoardTileDto lastDiscardedTile;
 
     @JsonProperty(value = "status")
     private HandStatus status;

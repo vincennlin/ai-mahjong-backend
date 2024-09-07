@@ -16,6 +16,7 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.RoundStatus;
@@ -77,12 +78,21 @@ public class HandServiceImpl implements HandService {
     }
 
     @Override
+    public PlayerViewDto getPlayerViewByGameIdAndGamePlayerId(Long gameId, Long gamePlayerId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        GamePlayer gamePlayer = getGamePlayerByGameAndGamePlayerId(hand.getRound().getGame(), gamePlayerId);
+
+        return boardMapper.mapToPlayerViewDto(hand, gamePlayer);
+    }
+
+    @Override
     public PlayerViewDto getCurrentPlayerViewByGameId(Long gameId) {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
         GamePlayer currentGamePlayer = hand.getGamePlayerByUserId(userService.getCurrentUserId());
-        currentGamePlayer.getPlayerTile().getHandTiles().sortHandTiles();
 
         return boardMapper.mapToPlayerViewDto(hand, currentGamePlayer);
     }
@@ -247,16 +257,56 @@ public class HandServiceImpl implements HandService {
         }
 
         BoardTile discardedTile = tileService.discardTile(gamePlayer.getPlayerTile(), boardTileId);
+        hand.setLastDiscardedTile(discardedTile);
 
-        GamePlayer finalGamePlayer = gamePlayer;
-        if (hand.getPlayerTiles().stream().anyMatch(
-                playerTile -> playerTile.getHandTiles().canCall(finalGamePlayer, discardedTile.getTile()))) {
-            hand.setStatus(HandStatus.WAITING_FOR_CALL);
-        } else {
+        for (PlayerTile playerTile : hand.getPlayerTiles()) {
+            GamePlayer otherGamePlayer = playerTile.getGamePlayer();
+            if (otherGamePlayer == gamePlayer) {
+                continue;
+            }
+            if (playerTile.getHandTiles().canCall(gamePlayer, discardedTile.getTile())) {
+                GamePlayer otherGamePlayerInGame = hand.getGamePlayerInGame(otherGamePlayer);
+                otherGamePlayerInGame.setStatus(GamePlayerStatus.THINKING_FOR_CALL);
+                hand.setStatus(HandStatus.WAITING_FOR_CALL);
+            }
+        }
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_CALL) {
             hand.setStatus(HandStatus.WAITING_FOR_DRAW);
         }
 
         return boardMapper.mapToDto(handRepository.save(hand));
+    }
+
+    @Override
+    public PlayerViewDto cancelForCall(Long gameId, Long gamePlayerId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for call state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByGameAndGamePlayerId(hand.getRound().getGame(), gamePlayerId);
+
+        if (gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, gamePlayer.getStatus(), "GamePlayer is not in thinking for call state");
+        }
+
+        gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.WAITING);
+
+        if (hand.getPlayerTiles().stream().allMatch(
+                playerTile -> {
+                    GamePlayer otherGamePlayer = playerTile.getGamePlayer();
+                    if (otherGamePlayer == gamePlayer) {
+                        return true;
+                    }
+                    return playerTile.getGamePlayer().getStatus() == GamePlayerStatus.WAITING;
+                })) {
+            hand.setStatus(HandStatus.WAITING_FOR_DRAW);
+        }
+
+        return boardMapper.mapToPlayerViewDto(hand, gamePlayer);
     }
 
     private GamePlayer getGamePlayerByGameAndGamePlayerId(Game game, Long gamePlayerId) {

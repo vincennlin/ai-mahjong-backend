@@ -21,13 +21,21 @@ public abstract class TileGroupDto {
     @JsonProperty(value = "tile_count")
     private int tileCount;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "tiles_num")
     private String tilesNum;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "tiles_sub")
     private String tilesSub;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "tiles")
     private List<BoardTileDto> tiles;
+
+    public void hideTiles() {
+        setTiles(null);
+        setTilesNum("*".repeat(tileCount));
+        setTilesSub("*".repeat(tileCount));
+    }
 }

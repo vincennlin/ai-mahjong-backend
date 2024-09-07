@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlayerTileGroupDto extends TileGroupDto{
+public class PlayerTileGroupDto extends TileGroupDto {
 
     @JsonProperty(value = "player_id")
     private Long playerId;

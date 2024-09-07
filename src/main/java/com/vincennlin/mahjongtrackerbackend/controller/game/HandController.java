@@ -40,6 +40,15 @@ public class HandController {
         return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
     }
 
+    @GetMapping("/games/{game_id}/game-players/{game_player_id}/player-view")
+    public ResponseEntity<PlayerViewDto> getPlayerViewByGameIdAndGamePlayerId(@PathVariable(name = "game_id") Long gameId,
+                                                                             @PathVariable(name = "game_player_id") Long gamePlayerId) {
+
+        PlayerViewDto playerViewDto = handService.getPlayerViewByGameIdAndGamePlayerId(gameId, gamePlayerId);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
+
     @PostMapping("/games/{game_id}/hands")
     public ResponseEntity<HandDto> startNewHand(@PathVariable(name = "game_id") Long gameId) {
 

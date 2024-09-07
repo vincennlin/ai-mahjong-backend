@@ -18,6 +18,8 @@ public interface HandService {
 
     BoardDto getBoardByGameId(Long gameId);
 
+    PlayerViewDto getPlayerViewByGameIdAndGamePlayerId(Long gameId, Long gamePlayerId);
+
     PlayerViewDto getCurrentPlayerViewByGameId(Long gameId);
 
     List<PlayerTile> getPlayerTileEntityListByGameId(Long gameId);
@@ -35,4 +37,6 @@ public interface HandService {
     BoardDto initialFoulHand(Long gameId);
 
     BoardDto discardTile(Long gameId, Long gamePlayerId, Long boardTileId);
+
+    PlayerViewDto cancelForCall(Long gameId, Long gamePlayerId);
 }

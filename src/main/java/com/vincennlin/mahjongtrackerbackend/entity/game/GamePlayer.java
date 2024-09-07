@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.entity.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
+import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,12 @@ import java.util.List;
 @Entity
 @Table(name = "game_players")
 public class GamePlayer {
+
+    public GamePlayer(Game game, Player player) {
+        this.game = game;
+        this.player = player;
+        this.status = GamePlayerStatus.WAITING;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +47,10 @@ public class GamePlayer {
     )
     @JoinColumn(name = "downwind_player_id", referencedColumnName = "id")
     private GamePlayer downwindPlayer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private GamePlayerStatus status;
 
 //    @Column(name = "score")
 //    private int score;

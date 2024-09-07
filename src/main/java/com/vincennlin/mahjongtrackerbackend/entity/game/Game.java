@@ -109,4 +109,11 @@ public class Game {
                 .findFirst()
                 .orElse(null);
     }
+
+    public GamePlayer getGamePlayerInGame(GamePlayer gamePlayer) {
+        return gamePlayers.stream()
+                .filter(player -> player.equals(gamePlayer))
+                .findFirst()
+                .orElse(null);
+    }
 }
