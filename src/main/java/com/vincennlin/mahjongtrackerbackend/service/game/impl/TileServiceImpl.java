@@ -3,13 +3,16 @@ package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
+import com.vincennlin.mahjongtrackerbackend.entity.game.Operation;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.*;
 import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
 import com.vincennlin.mahjongtrackerbackend.exception.WebAPIException;
+import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import com.vincennlin.mahjongtrackerbackend.repository.game.*;
+import com.vincennlin.mahjongtrackerbackend.service.game.OperationService;
 import com.vincennlin.mahjongtrackerbackend.service.game.TileService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,7 @@ public class TileServiceImpl implements TileService {
     private final ExposedTileGroupRepository exposedTileGroupRepository;
     private final DiscardedTileGroupRepository discardedTileGroupRepository;
     private final PlayerTileRepository playerTileRepository;
+    private final OperationService operationService;
 
     @Override
     public List<PlayerTile> createPlayerTileList(Hand hand) {
@@ -216,7 +220,7 @@ public class TileServiceImpl implements TileService {
     }
 
     @Override
-    public BoardTile discardTile(PlayerTile playerTile, Long boardTileId) {
+    public BoardTile discardTile(PlayerTile playerTile, Long boardTileId, Operation operation) {
 
         BoardTile boardTile = boardTileRepository.findById(boardTileId)
                 .orElseThrow(() -> new WebAPIException(HttpStatus.BAD_REQUEST, "Tile is not found"));
@@ -225,10 +229,18 @@ public class TileServiceImpl implements TileService {
             throw new WebAPIException(HttpStatus.BAD_REQUEST, "Tile is not in player's hand");
         }
 
-        playerTile.getDiscardedTiles().getTiles().add(boardTile);
-        boardTile.setTileGroup(playerTile.getDiscardedTiles());
+        operation.setGamePlayerOperation(GamePlayerOperation.DISCARD);
+        operation.setPreviousTileGroup(boardTile.getTileGroup());
 
-        return boardTileRepository.save(boardTile);
+        boardTile.setTileGroup(playerTile.getDiscardedTiles());
+        BoardTile savedBoardTile = boardTileRepository.save(boardTile);
+
+        playerTile.getDiscardedTiles().getTiles().add(savedBoardTile);
+        operation.setBoardTile(savedBoardTile);
+
+        operationService.saveOperation(operation);
+
+        return savedBoardTile;
     }
 
     private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {

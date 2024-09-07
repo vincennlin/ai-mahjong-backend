@@ -1,10 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
-import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
-import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
-import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
-import com.vincennlin.mahjongtrackerbackend.entity.game.Round;
+import com.vincennlin.mahjongtrackerbackend.entity.game.*;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
@@ -16,6 +13,7 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
@@ -41,6 +39,7 @@ public class HandServiceImpl implements HandService {
     private final RoundService roundService;
     private final TileService tileService;
     private final GamePlayerService gamePlayerService;
+    private final OperationService operationService;
 
     private final HandRepository handRepository;
 
@@ -256,7 +255,7 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "It is not the current player's turn");
         }
 
-        BoardTile discardedTile = tileService.discardTile(gamePlayer.getPlayerTile(), boardTileId);
+        BoardTile discardedTile = tileService.discardTile(gamePlayer.getPlayerTile(), boardTileId, operationService.createOperation(hand, gamePlayer));
         hand.setLastDiscardedTile(discardedTile);
 
         for (PlayerTile playerTile : hand.getPlayerTiles()) {
@@ -265,9 +264,9 @@ public class HandServiceImpl implements HandService {
                 continue;
             }
             if (playerTile.getHandTiles().canCall(gamePlayer, discardedTile.getTile())) {
-                GamePlayer otherGamePlayerInGame = hand.getGamePlayerInGame(otherGamePlayer);
-                otherGamePlayerInGame.setStatus(GamePlayerStatus.THINKING_FOR_CALL);
+                otherGamePlayer.setStatus(GamePlayerStatus.THINKING_FOR_CALL);
                 hand.setStatus(HandStatus.WAITING_FOR_CALL);
+                gamePlayerService.saveGamePlayer(otherGamePlayer);
             }
         }
 

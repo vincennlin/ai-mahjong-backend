@@ -1,5 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.TileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "operations")
 public class Operation {
+
+    public Operation(Hand hand, GamePlayer player) {
+        this.hand = hand;
+        this.player = player;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +43,16 @@ public class Operation {
     @Enumerated(EnumType.STRING)
     @Column(name = "game_player_operation")
     private GamePlayerOperation gamePlayerOperation;
+
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
+    )
+    private BoardTile boardTile;
+
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
+    )
+    private TileGroup previousTileGroup;
 }

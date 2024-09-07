@@ -1,6 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.service.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
+import com.vincennlin.mahjongtrackerbackend.entity.game.Operation;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
@@ -31,5 +32,5 @@ public interface TileService {
 
     BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
 
-    BoardTile discardTile(PlayerTile playerTile, Long boardTileId);
+    BoardTile discardTile(PlayerTile playerTile, Long boardTileId, Operation operation);
 }

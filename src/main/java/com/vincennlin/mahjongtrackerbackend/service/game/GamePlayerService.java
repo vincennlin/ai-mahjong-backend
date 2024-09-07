@@ -18,6 +18,8 @@ public interface GamePlayerService {
 
     GamePlayer createGamePlayerAndGetEntity(Game game, Player player);
 
+    GamePlayer saveGamePlayer(GamePlayer gamePlayer);
+
     GamePlayer setGamePlayerStatus(GamePlayer gamePlayer, GamePlayerStatus status);
 
     void deleteGamePlayerById(Long gamePlayerId);

@@ -68,6 +68,12 @@ public class GamePlayerServiceImpl implements GamePlayerService {
     }
 
     @Override
+    public GamePlayer saveGamePlayer(GamePlayer gamePlayer) {
+
+        return gamePlayerRepository.save(gamePlayer);
+    }
+
+    @Override
     public GamePlayer setGamePlayerStatus(GamePlayer gamePlayer, GamePlayerStatus status) {
 
         gamePlayer.setStatus(status);
