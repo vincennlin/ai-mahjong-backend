@@ -15,6 +15,7 @@ public enum HandStatus implements ProcessStatus {
     FINISHED_FOUL_HAND(Set.of(HandOperation.DISCARD_TILE)),
     WAITING_FOR_DISCARD(Set.of(HandOperation.DISCARD_TILE)),
     WAITING_FOR_CALL(Set.of(HandOperation.CALL_CHOW, HandOperation.CALL_PONG, HandOperation.CALL_KONG, HandOperation.CALL_WIN)),
+    WAITING_FOR_DRAW(Set.of(HandOperation.DRAW_TILE)),
     IN_PROGRESS(Set.of(HandOperation.DRAW_TILE, HandOperation.CALL_CHOW, HandOperation.CALL_PONG, HandOperation.CALL_KONG, HandOperation.CALL_WIN)),
     FINISHED(Set.of());
 

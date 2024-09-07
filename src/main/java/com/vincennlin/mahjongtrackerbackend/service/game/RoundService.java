@@ -10,5 +10,5 @@ public interface RoundService {
 
     Round startNewRoundAndGetEntity(Game game);
 
-    RoundDto saveRound(Round round);
+    Round saveRound(Round round);
 }

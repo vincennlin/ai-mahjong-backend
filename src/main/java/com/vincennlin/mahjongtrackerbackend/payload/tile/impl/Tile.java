@@ -51,6 +51,7 @@ public enum Tile implements TileInterface, Comparable<Tile> {
     SEASON_SUMMER("夏", 2, SubTileType.SEASON),
     SEASON_AUTUMN("秋", 3, SubTileType.SEASON),
     SEASON_WINTER("冬", 4, SubTileType.SEASON),
+
     FLOWER_PLUM("梅", 1, SubTileType.FLOWER),
     FLOWER_ORCHID("蘭", 2, SubTileType.FLOWER),
     FLOWER_BAMBOO("竹", 3, SubTileType.FLOWER),
@@ -59,6 +60,8 @@ public enum Tile implements TileInterface, Comparable<Tile> {
     private final String name;
     private final int rank;
     private final SubTileType subTileType;
+    private Tile previousTile;
+    private Tile nextTile;
 
     Tile(String name, int rank, SubTileType subTileType) {
         this.name = name;
@@ -73,4 +76,62 @@ public enum Tile implements TileInterface, Comparable<Tile> {
     public boolean isFlower() {
         return this.getTileType() == TileType.FLOWER;
     }
+
+    public boolean isSuit() {
+        return this.getTileType() == TileType.SUIT;
+    }
+
+    static {
+        CHARACTER_1.nextTile = CHARACTER_2;
+        CHARACTER_2.previousTile = CHARACTER_1;
+        CHARACTER_2.nextTile = CHARACTER_3;
+        CHARACTER_3.previousTile = CHARACTER_2;
+        CHARACTER_3.nextTile = CHARACTER_4;
+        CHARACTER_4.previousTile = CHARACTER_3;
+        CHARACTER_4.nextTile = CHARACTER_5;
+        CHARACTER_5.previousTile = CHARACTER_4;
+        CHARACTER_5.nextTile = CHARACTER_6;
+        CHARACTER_6.previousTile = CHARACTER_5;
+        CHARACTER_6.nextTile = CHARACTER_7;
+        CHARACTER_7.previousTile = CHARACTER_6;
+        CHARACTER_7.nextTile = CHARACTER_8;
+        CHARACTER_8.previousTile = CHARACTER_7;
+        CHARACTER_8.nextTile = CHARACTER_9;
+        CHARACTER_9.previousTile = CHARACTER_8;
+
+        DOT_1.nextTile = DOT_2;
+        DOT_2.previousTile = DOT_1;
+        DOT_2.nextTile = DOT_3;
+        DOT_3.previousTile = DOT_2;
+        DOT_3.nextTile = DOT_4;
+        DOT_4.previousTile = DOT_3;
+        DOT_4.nextTile = DOT_5;
+        DOT_5.previousTile = DOT_4;
+        DOT_5.nextTile = DOT_6;
+        DOT_6.previousTile = DOT_5;
+        DOT_6.nextTile = DOT_7;
+        DOT_7.previousTile = DOT_6;
+        DOT_7.nextTile = DOT_8;
+        DOT_8.previousTile = DOT_7;
+        DOT_8.nextTile = DOT_9;
+        DOT_9.previousTile = DOT_8;
+
+        STICK_1.nextTile = STICK_2;
+        STICK_2.previousTile = STICK_1;
+        STICK_2.nextTile = STICK_3;
+        STICK_3.previousTile = STICK_2;
+        STICK_3.nextTile = STICK_4;
+        STICK_4.previousTile = STICK_3;
+        STICK_4.nextTile = STICK_5;
+        STICK_5.previousTile = STICK_4;
+        STICK_5.nextTile = STICK_6;
+        STICK_6.previousTile = STICK_5;
+        STICK_6.nextTile = STICK_7;
+        STICK_7.previousTile = STICK_6;
+        STICK_7.nextTile = STICK_8;
+        STICK_8.previousTile = STICK_7;
+        STICK_8.nextTile = STICK_9;
+        STICK_9.previousTile = STICK_8;
+    }
 }
+

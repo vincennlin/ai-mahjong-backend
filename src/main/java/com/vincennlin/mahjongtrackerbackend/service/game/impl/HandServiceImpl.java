@@ -5,6 +5,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Round;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.exception.ProcessException;
@@ -12,6 +13,7 @@ import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.BoardMapper;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.HandMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
@@ -52,7 +54,9 @@ public class HandServiceImpl implements HandService {
     @Override
     public Hand getCurrentHandEntityByGameId(Long gameId) {
 
-        return gameService.getGameEntityById(gameId).getCurrentHand();
+        Game game = gameService.getGameEntityById(gameId);
+
+        return game.getCurrentHand();
     }
 
     @Override
@@ -108,9 +112,11 @@ public class HandServiceImpl implements HandService {
         Hand newHand = handRepository.save(hand);
 
         round.setStatus(RoundStatus.IN_PROGRESS);
-        roundService.saveRound(round);
+        round.getHands().add(newHand);
+        Round savedRound = roundService.saveRound(round);
 
         game.setStatus(GameStatus.IN_PROGRESS);
+        game.getRounds().add(savedRound);
         gameService.saveGame(game);
 
         return handMapper.mapToDto(newHand, round.getRoundWind());
@@ -240,15 +246,21 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "It is not the current player's turn");
         }
 
-        tileService.discardTile(gamePlayer.getPlayerTile(), boardTileId);
+        BoardTile discardedTile = tileService.discardTile(gamePlayer.getPlayerTile(), boardTileId);
 
-        hand.setStatus(HandStatus.WAITING_FOR_CALL);
+        GamePlayer finalGamePlayer = gamePlayer;
+        if (hand.getPlayerTiles().stream().anyMatch(
+                playerTile -> playerTile.getHandTiles().canCall(finalGamePlayer, discardedTile.getTile()))) {
+            hand.setStatus(HandStatus.WAITING_FOR_CALL);
+        } else {
+            hand.setStatus(HandStatus.WAITING_FOR_DRAW);
+        }
 
         return boardMapper.mapToDto(handRepository.save(hand));
     }
 
     private GamePlayer getGamePlayerByGameAndGamePlayerId(Game game, Long gamePlayerId) {
-        GamePlayer gamePlayer = gamePlayerService.getGamePlayerEntityByPlayerId(gamePlayerId);
+        GamePlayer gamePlayer = gamePlayerService.getGamePlayerEntityByGamePlayerId(gamePlayerId);
         if (gamePlayer.getGame() != game) {
             throw new ProcessException(HttpStatus.BAD_REQUEST, game.getCurrentHand().getStatus(), "GamePlayer does not belong to the game");
         }

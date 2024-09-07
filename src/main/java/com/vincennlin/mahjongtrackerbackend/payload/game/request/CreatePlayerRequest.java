@@ -15,6 +15,10 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CreatePlayerRequest {
 
+    public CreatePlayerRequest(PlayerType type) {
+        this.type = type;
+    }
+
     @JsonProperty(value = "type")
     private PlayerType type;
 

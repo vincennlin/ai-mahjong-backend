@@ -1,10 +1,15 @@
 package com.vincennlin.mahjongtrackerbackend.controller.game;
 
 import com.vincennlin.mahjongtrackerbackend.constant.page.PageConstants;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreatePlayerRequest;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
+import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
+import com.vincennlin.mahjongtrackerbackend.service.game.PlayerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -22,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 public class GameController {
 
     private final GameService gameService;
+    private final HandService handService;
+    private final PlayerService playerService;
 
     @GetMapping("/games")
     public ResponseEntity<GamePageResponse> getGames(
@@ -43,6 +50,42 @@ public class GameController {
         GameDto gameDto = gameService.getGameById(gameId);
 
         return new ResponseEntity<>(gameDto, HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/games/auto-start")
+    public ResponseEntity<BoardDto> autoStartGame(@Valid @RequestBody CreateGameRequest request) {
+
+        Long gameId = gameService.createGame(request).getId();
+
+        CreatePlayerRequest createPlayerRequest = new CreatePlayerRequest(PlayerType.BOT);
+
+        Long gamePlayer2Id = playerService.createPlayer(createPlayerRequest).getId();
+        Long gamePlayer3Id = playerService.createPlayer(createPlayerRequest).getId();
+        Long gamePlayer4Id = playerService.createPlayer(createPlayerRequest).getId();
+
+        gameService.addPlayerToGame(gameId, gamePlayer2Id);
+        gameService.addPlayerToGame(gameId, gamePlayer3Id);
+        gameService.addPlayerToGame(gameId, gamePlayer4Id);
+
+        gameService.pickSeats(gameId);
+
+        gameService.decideEastPlayer(gameId);
+
+        handService.startNewHand(gameId);
+
+        handService.initializeWallTiles(gameId);
+
+        handService.rollDice(gameId);
+
+        handService.dealTiles(gameId);
+
+        handService.breakWall(gameId);
+
+        BoardDto boardDto = handService.initialFoulHand(gameId);
+
+        return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
 
     @PostMapping("/games")

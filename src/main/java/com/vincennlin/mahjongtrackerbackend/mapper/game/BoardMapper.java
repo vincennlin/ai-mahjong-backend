@@ -6,13 +6,10 @@ import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.mapper.tile.TileGroupMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class BoardMapper {
@@ -31,6 +28,7 @@ public class BoardMapper {
         BoardDto boardDto = new BoardDto();
         boardDto.setHandId(hand.getId());
         boardDto.setActiveGamePlayerId(hand.getActiveGamePlayer().getId());
+        boardDto.setStatus(hand.getStatus());
         boardDto.setAcceptableOperations(hand.getStatus().getAcceptableOperations());
         boardDto.setWallTiles(tileGroupMapper.mapWallTileGroupToDto(hand.getWallTileGroup()));
         if (hand.getPlayerTiles() != null) {

@@ -60,6 +60,10 @@ public class GamePlayer {
         return game.getGamePlayers().indexOf(this);
     }
 
+    public GamePlayer getUpwindPlayer() {
+        return getDownwindPlayer().getDownwindPlayer().getDownwindPlayer();
+    }
+
     public PlayerTile getPlayerTile() {
         List<PlayerTile> playerTiles = game.getCurrentHand().getPlayerTiles();
         return playerTiles.stream()

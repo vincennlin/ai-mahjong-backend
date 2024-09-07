@@ -39,10 +39,8 @@ public class RoundServiceImpl implements RoundService {
     }
 
     @Override
-    public RoundDto saveRound(Round round) {
+    public Round saveRound(Round round) {
 
-        Round savedRound = roundRepository.save(round);
-
-        return roundMapper.mapToDto(savedRound);
+        return roundRepository.save(round);
     }
 }

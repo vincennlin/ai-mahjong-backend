@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.entity.tile;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.TileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.type.TileType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,5 +39,9 @@ public class BoardTile {
 
     public boolean isFlower() {
         return tile.isFlower();
+    }
+
+    public boolean isSuit() {
+        return tile.isSuit();
     }
 }

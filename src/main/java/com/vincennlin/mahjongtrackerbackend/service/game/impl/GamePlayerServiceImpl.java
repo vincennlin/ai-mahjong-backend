@@ -33,6 +33,12 @@ public class GamePlayerServiceImpl implements GamePlayerService {
     }
 
     @Override
+    public GamePlayer getGamePlayerEntityByGamePlayerId(Long gamePlayerId) {
+        return gamePlayerRepository.findById(gamePlayerId).orElseThrow(
+                () -> new ResourceNotFoundException("GamePlayer", "id", gamePlayerId));
+    }
+
+    @Override
     public GamePlayer getGamePlayerEntityByPlayerId(Long playerId) {
 
         return gamePlayerRepository.getGamePlayerByPlayerId(playerId).orElseThrow(

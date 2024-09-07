@@ -236,7 +236,7 @@ public class TileServiceImpl implements TileService {
         List<BoardTile> wallTiles = wallTileGroup.getTiles();
         BoardTile tile = wallTiles.remove(isFromHead ? 0 : wallTiles.size() - 1);
         tile.setTileGroup(playerTile.getHandTiles());
-        playerTile.getHandTiles().getTiles().add(0, tile);
+        playerTile.getHandTiles().getTiles().add(tile);
 
         return boardTileRepository.save(tile);
     }
