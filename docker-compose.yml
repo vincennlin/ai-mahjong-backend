@@ -1,0 +1,46 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: aimahjong-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: AIMahjongRootPassw0rd
+      MYSQL_DATABASE: aimahjong
+      MYSQL_USER: AIMahjongUser
+      MYSQL_PASSWORD: AIMahjongUserPassw0rd
+      TZ: "Asia/Taipei"
+    networks:
+      - aimahjong-network
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 10s
+
+  app:
+    image: vincennlin/aimahjongbackend
+    container_name: aimahjongbackend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://aimahjong-mysql:3306/aimahjong?useSSL=false&serverTimezone=Asia/Taipei&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+      TZ: "Asia/Taipei"
+    networks:
+      - aimahjong-network
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: always
+
+
+networks:
+  aimahjong-network:
+
+volumes:
+  mysql_data:
