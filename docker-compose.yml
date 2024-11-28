@@ -22,9 +22,9 @@ services:
       start_period: 5s
       timeout: 10s
 
-  app:
+  aimahjong-backend:
     image: vincennlin/aimahjongbackend
-    container_name: aimahjongbackend
+    container_name: aimahjong-backend
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:mysql://aimahjong-mysql:3306/aimahjong?useSSL=false&serverTimezone=Asia/Taipei&characterEncoding=utf-8&allowPublicKeyRetrieval=true
