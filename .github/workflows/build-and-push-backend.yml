@@ -40,7 +40,7 @@ jobs:
         id: push-aimahjongbackend
         uses: docker/build-push-action@v3
         with:
-          context: AIMahjongBackend
+          context: .
           push: true
           tags: vincennlin/aimahjongbackend:latest
           labels: ${{ steps.meta-aimahjongbackend.outputs.labels }}
