@@ -90,12 +90,13 @@ public class WebSecurity {
         http.authorizeHttpRequests(auth ->
                 auth
                         .requestMatchers(new AntPathRequestMatcher("/api/v1/**")).permitAll()
-//                        .requestMatchers(new AntPathRequestMatcher("/api/v1/**")).access(
-//                                new WebExpressionAuthorizationManager(webExpressionString))
                         .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/swagger-ui.html")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api-docs/**")).permitAll()  // 新增這一行
         );
+
 
         http.addFilter(authenticationFilter)
                 .addFilter(new AuthorizationFilter(authenticationManager, environment));

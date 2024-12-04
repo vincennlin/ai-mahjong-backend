@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @OpenAPIDefinition(
 		info = @Info(
-				title = "Mahjongtracker API",
+				title = "AIMahjong API",
 				version = "1.0",
 				contact = @io.swagger.v3.oas.annotations.info.Contact(
 						name = "vincennlin",
