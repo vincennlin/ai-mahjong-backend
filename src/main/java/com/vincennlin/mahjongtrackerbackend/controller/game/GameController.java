@@ -1,6 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.controller.game;
 
 import com.vincennlin.mahjongtrackerbackend.constant.page.PageConstants;
+import com.vincennlin.mahjongtrackerbackend.controller.game.swagger.GameControllerSwagger;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
-public class GameController {
+public class GameController implements GameControllerSwagger {
 
     private final GameService gameService;
     private final HandService handService;

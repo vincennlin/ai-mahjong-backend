@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.controller.game;
 
+import com.vincennlin.mahjongtrackerbackend.controller.game.swagger.HandControllerSwagger;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
-public class HandController {
+public class HandController implements HandControllerSwagger {
 
     private final HandService handService;
 
@@ -105,6 +106,16 @@ public class HandController {
 
         return new ResponseEntity<>(boardDto, HttpStatus.OK);
     }
+
+    //todo
+    /*
+    @PostMapping("/games/{game_id}/game-players/{game_player_id}/draw-tile")
+    public ResponseEntity<BoardDto> drawTileByGamePlayerId(@PathVariable(name = "game_id") Long gameId,
+                                                @PathVariable(name = "game_player_id") Long gamePlayerId) {
+
+
+    }
+     */
 
     @PostMapping("/games/{game_id}/game-players/{game_player_id}/discard/{board_tile_id}")
     public ResponseEntity<BoardDto> discardTileByGamePlayerId(@PathVariable(name = "game_id") Long gameId,

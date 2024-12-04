@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.controller.game;
 
+import com.vincennlin.mahjongtrackerbackend.controller.game.swagger.RoundControllerSwagger;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.RoundDto;
 import com.vincennlin.mahjongtrackerbackend.service.game.RoundService;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
-public class RoundController {
+public class RoundController implements RoundControllerSwagger {
 
     private final RoundService roundService;
 
