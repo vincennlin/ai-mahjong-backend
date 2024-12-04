@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.vincennlin</groupId>
-	<artifactId>mahjongtracker-backend</artifactId>
+	<artifactId>ai-mahjong-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>mahjongtracker-backend</name>
-	<description>Backend for Mahjong Tracker</description>
+	<name>ai-mahjong-backend</name>
+	<description>Backend for AI Mahjong</description>
 	<url/>
 	<licenses>
 		<license/>

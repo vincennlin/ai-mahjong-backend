@@ -1,0 +1,46 @@
+name: Build and Push Docker Images for AIMahjongBackend
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # Build and push AIMahjongBackend
+      - name: Build AIMahjongBackend with Maven
+        run: mvn -B package --file pom.xml -DskipTests
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata for AIMahjongBackend
+        id: meta-aimahjongbackend
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            vincennlin/aimahjongbackend
+
+      - name: Build and push Docker image for AIMahjongBackend
+        id: push-aimahjongbackend
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: vincennlin/aimahjongbackend:latest
+          labels: ${{ steps.meta-aimahjongbackend.outputs.labels }}
