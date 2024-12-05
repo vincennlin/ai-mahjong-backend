@@ -29,6 +29,7 @@ public class BoardMapper {
 
     public BoardDto mapToDto(Hand hand) {
         BoardDto boardDto = new BoardDto();
+        boardDto.setGameId(hand.getGame().getId());
         boardDto.setHandId(hand.getId());
         boardDto.setActiveGamePlayerId(hand.getActiveGamePlayer().getId());
         if (hand.getLastDiscardedTile() != null) {

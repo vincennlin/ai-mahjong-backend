@@ -15,8 +15,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BoardTileDto {
 
-    public BoardTileDto(Long id, String tileName) {
+    public BoardTileDto(Long id, int tileId, String tileName) {
         this.id = id;
+        this.tileId = tileId;
         this.tileName = tileName;
     }
 
@@ -26,6 +27,9 @@ public class BoardTileDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "tile")
     private Tile tile;
+
+    @JsonProperty(value = "tile_id")
+    private int tileId;
 
     @JsonProperty(value = "tile_name")
     private String tileName;

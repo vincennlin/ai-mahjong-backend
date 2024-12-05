@@ -130,4 +130,8 @@ public class Hand {
     public GamePlayer getGamePlayerInGame(GamePlayer gamePlayer) {
         return round.getGame().getGamePlayerInGame(gamePlayer);
     }
+
+    public Game getGame() {
+        return round.getGame();
+    }
 }
