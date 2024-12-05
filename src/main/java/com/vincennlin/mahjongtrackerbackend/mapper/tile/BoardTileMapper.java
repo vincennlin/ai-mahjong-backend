@@ -19,7 +19,7 @@ public class BoardTileMapper {
     }
 
     public BoardTileDto mapToDto(BoardTile boardTile) {
-        return new BoardTileDto(boardTile.getId(), boardTile.getTile().getName());
+        return new BoardTileDto(boardTile.getId(), boardTile.getTile().ordinal(), boardTile.getTile().getName());
     }
 
     public List<BoardTileDto> mapBoardTilesToDto(List<BoardTile> boardTiles) {
