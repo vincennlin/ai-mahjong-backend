@@ -62,6 +62,7 @@ public class WebSecurity {
 //        config.setAllowedOrigins(Collections.singletonList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Collections.singletonList("*"));
+        config.setExposedHeaders(Arrays.asList("Access-Token", "Token-Type"));
         config.setAllowCredentials(true); // 允許憑證（例如 Cookie）
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
