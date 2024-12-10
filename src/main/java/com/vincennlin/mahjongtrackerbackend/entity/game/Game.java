@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
@@ -85,6 +86,11 @@ public class Game {
                 .anyMatch(gamePlayer -> gamePlayer.getPlayer().getId().equals(playerId));
     }
 
+    public boolean containsUserById(Long userId) {
+        return gamePlayers.stream()
+                .anyMatch(gamePlayer -> gamePlayer.getPlayer().getUser().getId().equals(userId));
+    }
+
     public Wind getNextRoundWind() {
         if (rounds == null || rounds.isEmpty()) {
             return Wind.EAST;
@@ -105,7 +111,8 @@ public class Game {
 
     public GamePlayer getGamePlayerByUserId(Long userId) {
         return gamePlayers.stream()
-                .filter(gamePlayer -> gamePlayer.getPlayer().getId().equals(userId))
+                .filter(gamePlayer -> gamePlayer.getPlayer().getUser().getId().equals(userId)
+                        && gamePlayer.getPlayer().getType() == PlayerType.HUMAN)
                 .findFirst()
                 .orElse(null);
     }

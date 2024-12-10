@@ -2,7 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.controller.game;
 
 import com.vincennlin.mahjongtrackerbackend.constant.page.PageConstants;
 import com.vincennlin.mahjongtrackerbackend.controller.game.swagger.GameControllerSwagger;
-import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
@@ -11,6 +11,7 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreatePlayerReq
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
 import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
 import com.vincennlin.mahjongtrackerbackend.service.game.PlayerService;
+import com.vincennlin.mahjongtrackerbackend.service.user.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 public class GameController implements GameControllerSwagger {
 
+    private final UserService userService;
     private final GameService gameService;
     private final HandService handService;
     private final PlayerService playerService;
@@ -56,19 +58,22 @@ public class GameController implements GameControllerSwagger {
 
 
     @PostMapping("/games/auto-start")
-    public ResponseEntity<BoardDto> autoStartGame(@Valid @RequestBody CreateGameRequest request) {
+    public ResponseEntity<PlayerViewDto> autoStartGame(@Valid @RequestBody CreateGameRequest request) {
 
         Long gameId = gameService.createGame(request).getId();
 
-        CreatePlayerRequest createPlayerRequest = new CreatePlayerRequest(PlayerType.BOT);
+        CreatePlayerRequest createUser2PlayerRequest = new CreatePlayerRequest(userService.getUserEntityByUserId(3L), PlayerType.HUMAN);
+        Long user2GamePlayerId = playerService.createPlayer(createUser2PlayerRequest).getId();
 
-        Long gamePlayer2Id = playerService.createPlayer(createPlayerRequest).getId();
-        Long gamePlayer3Id = playerService.createPlayer(createPlayerRequest).getId();
-        Long gamePlayer4Id = playerService.createPlayer(createPlayerRequest).getId();
+        CreatePlayerRequest createUser3PlayerRequest = new CreatePlayerRequest(userService.getUserEntityByUserId(4L), PlayerType.HUMAN);
+        Long user3GamePlayerId = playerService.createPlayer(createUser3PlayerRequest).getId();
 
-        gameService.addPlayerToGame(gameId, gamePlayer2Id);
-        gameService.addPlayerToGame(gameId, gamePlayer3Id);
-        gameService.addPlayerToGame(gameId, gamePlayer4Id);
+        CreatePlayerRequest createUser4PlayerRequest = new CreatePlayerRequest(userService.getUserEntityByUserId(5L), PlayerType.HUMAN);
+        Long user4GamePlayerId = playerService.createPlayer(createUser4PlayerRequest).getId();
+
+        gameService.addPlayerToGame(gameId, user2GamePlayerId);
+        gameService.addPlayerToGame(gameId, user3GamePlayerId);
+        gameService.addPlayerToGame(gameId, user4GamePlayerId);
 
         gameService.pickSeats(gameId);
 
@@ -84,9 +89,9 @@ public class GameController implements GameControllerSwagger {
 
         handService.breakWall(gameId);
 
-        BoardDto boardDto = handService.initialFoulHand(gameId);
+        PlayerViewDto playerViewDto = handService.initialFoulHand(gameId);
 
-        return new ResponseEntity<>(boardDto, HttpStatus.OK);
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
     }
 
     @PostMapping("/games")

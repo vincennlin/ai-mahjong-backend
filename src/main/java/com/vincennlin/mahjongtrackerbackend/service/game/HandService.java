@@ -34,9 +34,11 @@ public interface HandService {
 
     BoardDto breakWall(Long gameId);
 
-    BoardDto initialFoulHand(Long gameId);
+    PlayerViewDto initialFoulHand(Long gameId);
 
-    BoardDto discardTile(Long gameId, Long gamePlayerId, Long boardTileId);
+    PlayerViewDto discardTile(Long gameId, Long boardTileId);
 
-    PlayerViewDto cancelForCall(Long gameId, Long gamePlayerId);
+    PlayerViewDto cancelForCall(Long gameId);
+
+    PlayerViewDto drawTile(Long gameId);
 }
