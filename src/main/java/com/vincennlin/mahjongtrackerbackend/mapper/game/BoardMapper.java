@@ -53,6 +53,7 @@ public class BoardMapper {
 
     public PlayerViewDto mapToPlayerViewDto(Hand hand, GamePlayer gamePlayer) {
         PlayerViewDto playerViewDto = new PlayerViewDto();
+        playerViewDto.setGameId(hand.getGame().getId());
         playerViewDto.setHandId(hand.getId());
         playerViewDto.setActiveGamePlayerId(hand.getActiveGamePlayer().getId());
         if (hand.getLastDiscardedTile() != null) {

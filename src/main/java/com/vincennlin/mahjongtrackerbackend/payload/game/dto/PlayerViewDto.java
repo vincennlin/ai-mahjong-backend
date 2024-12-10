@@ -22,6 +22,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class PlayerViewDto {
 
+    @JsonProperty(value = "game_id")
+    private Long gameId;
+
     @JsonProperty(value = "hand_id")
     private Long handId;
 
