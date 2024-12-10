@@ -137,8 +137,8 @@ public interface GameControllerSwagger {
     ResponseEntity<GameDto> getGameById(@PathVariable(name = "game_id") Long gameId);
 
     @Operation(
-            summary = "自動開始遊戲",
-            description = "自動開始遊戲至準備捨牌的階段，並加入 3 位 BOT 玩家"
+            summary = "[NEW] 自動開始遊戲",
+            description = "自動開始遊戲至準備捨牌的階段，並加入 user2, user3, user4 共 3 位 HUMAN 玩家"
     )
     @ApiResponse(
             responseCode = "200",
@@ -146,7 +146,245 @@ public interface GameControllerSwagger {
             content = @Content(
                     mediaType = "application/json",
                     examples = @ExampleObject(value = """
-                            
+                            {
+                                "hand_id": 1,
+                                "round_wind": "EAST",
+                                "prevailing_wind": "EAST",
+                                "active_game_player_id": 4,
+                                "last_discarded_tile": null,
+                                "hand_status": "WAITING_FOR_DISCARD",
+                                "game_player_status": "WAITING",
+                                "acceptable_operations": [],
+                                "player_tile": {
+                                    "id": 4,
+                                    "hand_id": 1,
+                                    "game_player_id": 1,
+                                    "hand_tiles": {
+                                        "id": 11,
+                                        "tile_count": 16,
+                                        "tiles_num": "五七八九 一一一三三五七七 二三 紅發",
+                                        "tiles_sub": "萬萬萬萬 筒筒筒筒筒筒筒筒 條條 中財",
+                                        "tiles": [
+                                            {
+                                                "id": 46,
+                                                "tile_id": 4,
+                                                "tile_name": "五萬"
+                                            },
+                                            {
+                                                "id": 16,
+                                                "tile_id": 6,
+                                                "tile_name": "七萬"
+                                            },
+                                            {
+                                                "id": 47,
+                                                "tile_id": 7,
+                                                "tile_name": "八萬"
+                                            },
+                                            {
+                                                "id": 48,
+                                                "tile_id": 8,
+                                                "tile_name": "九萬"
+                                            },
+                                            {
+                                                "id": 31,
+                                                "tile_id": 9,
+                                                "tile_name": "一筒"
+                                            },
+                                            {
+                                                "id": 61,
+                                                "tile_id": 9,
+                                                "tile_name": "一筒"
+                                            },
+                                            {
+                                                "id": 64,
+                                                "tile_id": 9,
+                                                "tile_name": "一筒"
+                                            },
+                                            {
+                                                "id": 29,
+                                                "tile_id": 11,
+                                                "tile_name": "三筒"
+                                            },
+                                            {
+                                                "id": 30,
+                                                "tile_id": 11,
+                                                "tile_name": "三筒"
+                                            },
+                                            {
+                                                "id": 62,
+                                                "tile_id": 13,
+                                                "tile_name": "五筒"
+                                            },
+                                            {
+                                                "id": 32,
+                                                "tile_id": 15,
+                                                "tile_name": "七筒"
+                                            },
+                                            {
+                                                "id": 45,
+                                                "tile_id": 15,
+                                                "tile_name": "七筒"
+                                            },
+                                            {
+                                                "id": 13,
+                                                "tile_id": 19,
+                                                "tile_name": "二條"
+                                            },
+                                            {
+                                                "id": 15,
+                                                "tile_id": 20,
+                                                "tile_name": "三條"
+                                            },
+                                            {
+                                                "id": 63,
+                                                "tile_id": 31,
+                                                "tile_name": "紅中"
+                                            },
+                                            {
+                                                "id": 14,
+                                                "tile_id": 32,
+                                                "tile_name": "發財"
+                                            }
+                                        ],
+                                        "player_id": 1
+                                    },
+                                    "exposed_tiles": {
+                                        "id": 12,
+                                        "tile_count": 0,
+                                        "tiles_num": "",
+                                        "tiles_sub": "",
+                                        "tiles": [],
+                                        "player_id": 1
+                                    },
+                                    "discarded_tiles": {
+                                        "id": 13,
+                                        "tile_count": 0,
+                                        "tiles_num": "",
+                                        "tiles_sub": "",
+                                        "tiles": [],
+                                        "player_id": 1
+                                    }
+                                },
+                                "downwind_player_tile": {
+                                    "id": 1,
+                                    "hand_id": 1,
+                                    "game_player_id": 4,
+                                    "hand_tiles": {
+                                        "id": 2,
+                                        "tile_count": 17,
+                                        "tiles_num": "*****************",
+                                        "tiles_sub": "*****************",
+                                        "player_id": 4
+                                    },
+                                    "exposed_tiles": {
+                                        "id": 3,
+                                        "tile_count": 2,
+                                        "tiles_num": "菊 春",
+                                        "tiles_sub": " ",
+                                        "tiles": [
+                                            {
+                                                "id": 33,
+                                                "tile_id": 41,
+                                                "tile_name": "菊"
+                                            },
+                                            {
+                                                "id": 18,
+                                                "tile_id": 34,
+                                                "tile_name": "春"
+                                            }
+                                        ],
+                                        "player_id": 4
+                                    },
+                                    "discarded_tiles": {
+                                        "id": 4,
+                                        "tile_count": 0,
+                                        "tiles_num": "",
+                                        "tiles_sub": "",
+                                        "tiles": [],
+                                        "player_id": 4
+                                    }
+                                },
+                                "opposite_player_tile": {
+                                    "id": 2,
+                                    "hand_id": 1,
+                                    "game_player_id": 2,
+                                    "hand_tiles": {
+                                        "id": 5,
+                                        "tile_count": 16,
+                                        "tiles_num": "****************",
+                                        "tiles_sub": "****************",
+                                        "player_id": 2
+                                    },
+                                    "exposed_tiles": {
+                                        "id": 6,
+                                        "tile_count": 1,
+                                        "tiles_num": "梅",
+                                        "tiles_sub": "",
+                                        "tiles": [
+                                            {
+                                                "id": 53,
+                                                "tile_id": 38,
+                                                "tile_name": "梅"
+                                            }
+                                        ],
+                                        "player_id": 2
+                                    },
+                                    "discarded_tiles": {
+                                        "id": 7,
+                                        "tile_count": 0,
+                                        "tiles_num": "",
+                                        "tiles_sub": "",
+                                        "tiles": [],
+                                        "player_id": 2
+                                    }
+                                },
+                                "upwind_player_tile": {
+                                    "id": 3,
+                                    "hand_id": 1,
+                                    "game_player_id": 3,
+                                    "hand_tiles": {
+                                        "id": 8,
+                                        "tile_count": 16,
+                                        "tiles_num": "****************",
+                                        "tiles_sub": "****************",
+                                        "player_id": 3
+                                    },
+                                    "exposed_tiles": {
+                                        "id": 9,
+                                        "tile_count": 2,
+                                        "tiles_num": "竹蘭",
+                                        "tiles_sub": "",
+                                        "tiles": [
+                                            {
+                                                "id": 44,
+                                                "tile_id": 40,
+                                                "tile_name": "竹"
+                                            },
+                                            {
+                                                "id": 25,
+                                                "tile_id": 39,
+                                                "tile_name": "蘭"
+                                            }
+                                        ],
+                                        "player_id": 3
+                                    },
+                                    "discarded_tiles": {
+                                        "id": 10,
+                                        "tile_count": 0,
+                                        "tiles_num": "",
+                                        "tiles_sub": "",
+                                        "tiles": [],
+                                        "player_id": 3
+                                    }
+                                },
+                                "wall_tiles": {
+                                    "id": 1,
+                                    "tile_count": 74,
+                                    "tiles_num": "**************************************************************************",
+                                    "tiles_sub": "**************************************************************************",
+                                    "hand_id": 1
+                                }
+                            }
                             """)
             )
     )
