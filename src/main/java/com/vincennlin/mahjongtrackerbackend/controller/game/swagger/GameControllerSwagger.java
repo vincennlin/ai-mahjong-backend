@@ -4,7 +4,7 @@ import com.vincennlin.mahjongtrackerbackend.constant.page.PageConstants;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
-import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.game.CreateGameRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

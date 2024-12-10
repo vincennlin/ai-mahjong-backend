@@ -5,7 +5,6 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.BoardTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.WallTileGroupDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
-import com.vincennlin.mahjongtrackerbackend.payload.game.operation.HandOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
@@ -67,7 +66,7 @@ public class PlayerViewDto {
     @JsonProperty(value = "wall_tiles")
     private WallTileGroupDto wallTiles;
 
-    public void hidTiles() {
+    public void hideTiles() {
         downwindPlayerTile.getHandTiles().hideTiles();
         oppositePlayerTile.getHandTiles().hideTiles();
         upwindPlayerTile.getHandTiles().hideTiles();
