@@ -65,7 +65,7 @@ public class PlayerServiceImpl implements PlayerService {
         Player player = new Player();
         player.setType(request.getType());
 
-        User user = authService.getCurrentUser();
+        User user = request.getUser();
         player.setUser(user);
 
         if (request.getPlayerName() != null) {

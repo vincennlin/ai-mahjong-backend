@@ -91,48 +91,54 @@ public class HandController implements HandControllerSwagger {
     }
 
     @PostMapping("/games/{game_id}/hands/initial-foul-hand")
-    public ResponseEntity<BoardDto> initialFoulHand(@PathVariable(name = "game_id") Long gameId) {
+    public ResponseEntity<PlayerViewDto> initialFoulHand(@PathVariable(name = "game_id") Long gameId) {
 
-        BoardDto boardDto = handService.initialFoulHand(gameId);
-
-        return new ResponseEntity<>(boardDto, HttpStatus.OK);
-    }
-
-    @PostMapping("/games/{game_id}/discard/{board_tile_id}")
-    public ResponseEntity<BoardDto> discardTile(@PathVariable(name = "game_id") Long gameId,
-                                                @PathVariable(name = "board_tile_id") Long boardTileId) {
-
-        BoardDto boardDto = handService.discardTile(gameId, null, boardTileId);
-
-        return new ResponseEntity<>(boardDto, HttpStatus.OK);
-    }
-
-    //todo
-    /*
-    @PostMapping("/games/{game_id}/game-players/{game_player_id}/draw-tile")
-    public ResponseEntity<BoardDto> drawTileByGamePlayerId(@PathVariable(name = "game_id") Long gameId,
-                                                @PathVariable(name = "game_player_id") Long gamePlayerId) {
-
-
-    }
-     */
-
-    @PostMapping("/games/{game_id}/game-players/{game_player_id}/discard/{board_tile_id}")
-    public ResponseEntity<BoardDto> discardTileByGamePlayerId(@PathVariable(name = "game_id") Long gameId,
-                                                @PathVariable(name = "game_player_id") Long gamePlayerId,
-                                                @PathVariable(name = "board_tile_id") Long boardTileId) {
-
-        BoardDto boardDto = handService.discardTile(gameId, gamePlayerId, boardTileId);
-
-        return new ResponseEntity<>(boardDto, HttpStatus.OK);
-    }
-
-    @PostMapping("/games/{game_id}/game-players/{game_player_id}/cancel-for-call")
-    public ResponseEntity<PlayerViewDto> cancelForCall(@PathVariable(name = "game_id") Long gameId,
-                                                @PathVariable(name = "game_player_id") Long gamePlayerId) {
-
-        PlayerViewDto playerViewDto = handService.cancelForCall(gameId, gamePlayerId);
+        PlayerViewDto playerViewDto = handService.initialFoulHand(gameId);
 
         return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
     }
+
+    @PostMapping("/games/{game_id}/discard/{board_tile_id}")
+    public ResponseEntity<PlayerViewDto> discardTile(@PathVariable(name = "game_id") Long gameId,
+                                                @PathVariable(name = "board_tile_id") Long boardTileId) {
+
+        PlayerViewDto playerViewDto = handService.discardTile(gameId, boardTileId);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
+
+//    @PostMapping("/games/{game_id}/game-players/{game_player_id}/discard/{board_tile_id}")
+//    public ResponseEntity<PlayerViewDto> discardTileByGamePlayerId(@PathVariable(name = "game_id") Long gameId,
+//                                                @PathVariable(name = "game_player_id") Long gamePlayerId,
+//                                                @PathVariable(name = "board_tile_id") Long boardTileId) {
+//
+//        PlayerViewDto playerViewDto = handService.discardTile(gameId, gamePlayerId, boardTileId);
+//
+//        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+//    }
+
+    @PostMapping("/games/{game_id}/cancel-for-call")
+    public ResponseEntity<PlayerViewDto> cancelForCall(@PathVariable(name = "game_id") Long gameId) {
+
+        PlayerViewDto playerViewDto = handService.cancelForCall(gameId);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/games/{game_id}/draw-tile")
+    public ResponseEntity<PlayerViewDto> drawTile(@PathVariable(name = "game_id") Long gameId) {
+
+        PlayerViewDto playerViewDto = handService.drawTile(gameId);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
+
+//    @PostMapping("/games/{game_id}/game-players/{game_player_id}/draw-tile")
+//    public ResponseEntity<PlayerViewDto> drawTileByGamePlayerId(@PathVariable(name = "game_id") Long gameId,
+//                                                @PathVariable(name = "game_player_id") Long gamePlayerId) {
+//
+//        PlayerViewDto playerViewDto = handService.drawTile(gameId, gamePlayerId);
+//
+//        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+//    }
 }

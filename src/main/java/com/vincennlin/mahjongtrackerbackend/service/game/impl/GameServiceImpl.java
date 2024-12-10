@@ -61,7 +61,9 @@ public class GameServiceImpl implements GameService {
         Game game = gameRepository.findById(gameId).orElseThrow(
                 () -> new ResourceNotFoundException("Game", "id", gameId));
 
-        authorizeOwnershipByGameCreatorId(game.getCreator().getId());
+        if (!game.containsUserById(authService.getCurrentUserId())) {
+            throw new ResourceOwnershipException(authService.getCurrentUserId());
+        }
 
         return game;
     }

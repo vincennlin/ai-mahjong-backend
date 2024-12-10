@@ -55,7 +55,9 @@ public class BoardMapper {
         PlayerViewDto playerViewDto = new PlayerViewDto();
         playerViewDto.setHandId(hand.getId());
         playerViewDto.setActiveGamePlayerId(hand.getActiveGamePlayer().getId());
-        playerViewDto.setLastDiscardedTile(boardTileMapper.mapToDto(hand.getLastDiscardedTile()));
+        if (hand.getLastDiscardedTile() != null) {
+            playerViewDto.setLastDiscardedTile(boardTileMapper.mapToDto(hand.getLastDiscardedTile()));
+        }
         playerViewDto.setHandStatus(hand.getStatus());
         playerViewDto.setGamePlayerStatus(gamePlayer.getStatus());
         playerViewDto.setAcceptableOperations(gamePlayer.getPlayerTile().getHandTiles().getAcceptableOperations());
