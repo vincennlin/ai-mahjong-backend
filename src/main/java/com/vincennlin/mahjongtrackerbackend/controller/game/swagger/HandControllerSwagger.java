@@ -1253,6 +1253,19 @@ public interface HandControllerSwagger {
             summary = "[NEW] 取得出牌建議",
             description = "取得出牌建議，當玩家在 \"THINKING_FOR_DISCARD\" 狀態時可以取得出牌建議。"
     )
+    @ApiResponse(
+            responseCode = "200",
+            description = "成功取得出牌建議",
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(value = """
+                            {
+                                "discard_tile": "白板",
+                                "discard_reason": "白板為孤張字牌，且目前沒有其他搭子的機會，建議捨去以降低手牌的複雜度。"
+                            }
+                            """)
+            )
+    )
     @PostMapping("/games/{game_id}/generate-discard-advice")
     ResponseEntity<DiscardAdviceResponse> generateDiscardAdvice(@PathVariable(name = "game_id") Long gameId);
 }
