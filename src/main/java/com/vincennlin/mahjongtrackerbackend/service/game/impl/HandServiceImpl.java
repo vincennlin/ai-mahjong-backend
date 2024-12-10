@@ -14,6 +14,7 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.ai.DiscardAdviceResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
@@ -40,6 +41,7 @@ public class HandServiceImpl implements HandService {
     private final TileService tileService;
     private final GamePlayerService gamePlayerService;
     private final OperationService operationService;
+    private final AiService aiService;
 
     private final HandRepository handRepository;
 
@@ -343,6 +345,26 @@ public class HandServiceImpl implements HandService {
         Hand savedHand = handRepository.save(hand);
 
         return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
+    @Override
+    public DiscardAdviceResponse generateDiscardAdvice(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_DISCARD) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for discard state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        if (hand.getActiveGamePlayer() != gamePlayer || gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_DISCARD) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "It is not the current player's turn");
+        }
+
+        PlayerViewDto playerViewDto = getPlayerViewDtoByHandAndGamePlayer(hand, gamePlayer);
+
+        return aiService.generateDiscardAdvice(playerViewDto);
     }
 
     private GamePlayer getGamePlayerByHandAndCurrentUserId(Hand hand) {

@@ -81,7 +81,7 @@ public class BoardMapper {
         playerViewDto.setOppositePlayerTile(tileGroupMapper.mapPlayerTileToDto(hand.getPlayerTileByGamePlayer(gamePlayer.getDownwindPlayer().getDownwindPlayer())));
         playerViewDto.setUpwindPlayerTile(tileGroupMapper.mapPlayerTileToDto(hand.getPlayerTileByGamePlayer(gamePlayer.getDownwindPlayer().getDownwindPlayer().getDownwindPlayer())));
 
-        playerViewDto.hidTiles();
+        playerViewDto.hideTiles();
 
         return playerViewDto;
     }

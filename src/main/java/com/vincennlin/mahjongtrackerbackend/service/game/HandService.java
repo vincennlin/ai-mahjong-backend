@@ -5,6 +5,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.ai.DiscardAdviceResponse;
 
 import java.util.List;
 
@@ -41,4 +42,6 @@ public interface HandService {
     PlayerViewDto cancelForCall(Long gameId);
 
     PlayerViewDto drawTile(Long gameId);
+
+    DiscardAdviceResponse generateDiscardAdvice(Long gameId);
 }

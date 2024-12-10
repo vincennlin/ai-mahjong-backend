@@ -4,6 +4,7 @@ import com.vincennlin.mahjongtrackerbackend.controller.game.swagger.HandControll
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.ai.DiscardAdviceResponse;
 import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -131,6 +132,14 @@ public class HandController implements HandControllerSwagger {
         PlayerViewDto playerViewDto = handService.drawTile(gameId);
 
         return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/games/{game_id}/generate-discard-advice")
+    public ResponseEntity<DiscardAdviceResponse> generateDiscardAdvice(@PathVariable(name = "game_id") Long gameId) {
+
+        DiscardAdviceResponse response = handService.generateDiscardAdvice(gameId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 //    @PostMapping("/games/{game_id}/game-players/{game_player_id}/draw-tile")

@@ -5,9 +5,9 @@ import com.vincennlin.mahjongtrackerbackend.controller.game.swagger.GameControll
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
-import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.game.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreatePlayerRequest;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.player.CreatePlayerRequest;
 import com.vincennlin.mahjongtrackerbackend.service.game.GameService;
 import com.vincennlin.mahjongtrackerbackend.service.game.HandService;
 import com.vincennlin.mahjongtrackerbackend.service.game.PlayerService;

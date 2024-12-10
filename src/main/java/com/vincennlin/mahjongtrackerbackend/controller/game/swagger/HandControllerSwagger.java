@@ -3,6 +3,7 @@ package com.vincennlin.mahjongtrackerbackend.controller.game.swagger;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.ai.DiscardAdviceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -1247,4 +1248,11 @@ public interface HandControllerSwagger {
     )
     @PostMapping("/games/{game_id}/draw-tile")
     ResponseEntity<PlayerViewDto> drawTile(@PathVariable(name = "game_id") Long gameId);
+
+    @Operation(
+            summary = "[NEW] 取得出牌建議",
+            description = "取得出牌建議，當玩家在 \"THINKING_FOR_DISCARD\" 狀態時可以取得出牌建議。"
+    )
+    @PostMapping("/games/{game_id}/generate-discard-advice")
+    ResponseEntity<DiscardAdviceResponse> generateDiscardAdvice(@PathVariable(name = "game_id") Long gameId);
 }
