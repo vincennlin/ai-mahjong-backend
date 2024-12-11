@@ -3,7 +3,6 @@ package com.vincennlin.mahjongtrackerbackend.entity.tile;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.*;
-import com.vincennlin.mahjongtrackerbackend.payload.board.MeldType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -70,6 +69,14 @@ public class PlayerTile {
 
     public String[] convertTilesToString(TileGroup tileGroup) {
         return tileGroup.convertTilesToString();
+    }
+
+    public void addBoardTileToTileGroup(BoardTile boardTile) {
+        if (boardTile.isFlower()) {
+            flowerTiles.addBoardTileToTileGroup(boardTile);
+        } else {
+            handTiles.addBoardTileToTileGroup(boardTile);
+        }
     }
 
     public void pongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {

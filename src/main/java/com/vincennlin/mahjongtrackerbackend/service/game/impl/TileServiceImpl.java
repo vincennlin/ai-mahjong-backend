@@ -197,12 +197,13 @@ public class TileServiceImpl implements TileService {
         List<BoardTile> handTiles = handTileGroup.getTiles();
 
         while (handTiles.get(handTiles.size() - 1).getTile().isFlower()) {
-            BoardTile tile = handTileGroup.removeLastBoardTile();
-            flowerTileGroup.addBoardTileToTileGroup(tile);
+            flowerTileGroup.addBoardTileToTileGroup(handTileGroup.removeLastBoardTile());
 
-            foulHand(playerTile, wallTileGroup);
+            BoardTile boardTile = wallTileGroup.drawTileFromWall(false);
+            handTiles.add(boardTile);
+            boardTile.setTileGroup(handTileGroup);
 
-            boardTileRepository.save(tile);
+            boardTileRepository.save(boardTile);
         }
 
         playerTile.getHandTiles().sortHandTiles();
@@ -227,7 +228,7 @@ public class TileServiceImpl implements TileService {
     private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {
 
         BoardTile boardTile = wallTileGroup.drawTileFromWall(isFromHead);
-        playerTile.getHandTiles().addBoardTileToTileGroup(boardTile);
+        playerTile.addBoardTileToTileGroup(boardTile);
 
         return boardTileRepository.save(boardTile);
     }
