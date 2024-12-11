@@ -2,16 +2,16 @@ package com.vincennlin.mahjongtrackerbackend.mapper.tile;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.ExposedTileGroup;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.PlayerTileGroup;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
-import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.BoardTileDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileGroupDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.WallTileGroupDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.*;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class TileGroupMapper {
@@ -36,6 +36,31 @@ public class TileGroupMapper {
         wallTileGroupDto.setTileCount(wallTileGroup.getTiles().size());
         wallTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(wallTileGroup.getTiles()));
         return wallTileGroupDto;
+    }
+
+    public List<ExposedTileGroupDto> mapExposedTileGroupListToStringDto(List<ExposedTileGroup> exposedTileGroups) {
+        if (exposedTileGroups != null) {
+            return exposedTileGroups.stream()
+                    .map(this::mapExposedTileGroupsToStringDto)
+                    .toList();
+        }
+        return null;
+    }
+
+    public ExposedTileGroupDto mapExposedTileGroupsToStringDto(ExposedTileGroup exposedTileGroup) {
+        ExposedTileGroupDto exposedTileGroupDto = modelMapper.map(exposedTileGroup, ExposedTileGroupDto.class);
+        String[] tilesString = exposedTileGroup.convertTilesToString();
+        exposedTileGroupDto.setTilesNum(tilesString[0]);
+        exposedTileGroupDto.setTilesSub(tilesString[1]);
+        exposedTileGroupDto.setTileCount(exposedTileGroup.getTiles().size());
+
+        exposedTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(exposedTileGroup.getTiles()));
+
+        exposedTileGroupDto.setPlayerId(exposedTileGroup.getPlayerId());
+
+        exposedTileGroupDto.setMeldType(exposedTileGroup.getMeldType());
+
+        return exposedTileGroupDto;
     }
 
     public PlayerTileGroupDto mapPlayerTileGroupToStringDto(PlayerTileGroup playerTileGroup) {
@@ -70,7 +95,8 @@ public class TileGroupMapper {
 //        playerTileDto.setDiscardedTiles(mapPlayerTileGroupToDto(playerTile.getDiscardedTiles()));
 
         playerTileDto.setHandTiles(mapPlayerTileGroupToStringDto(playerTile.getHandTiles()));
-        playerTileDto.setExposedTiles(mapPlayerTileGroupToStringDto(playerTile.getExposedTiles()));
+        playerTileDto.setFlowerTiles(mapPlayerTileGroupToStringDto(playerTile.getFlowerTiles()));
+        playerTileDto.setExposedTileList(mapExposedTileGroupListToStringDto(playerTile.getExposedTiles()));
         playerTileDto.setDiscardedTiles(mapPlayerTileGroupToStringDto(playerTile.getDiscardedTiles()));
         return playerTileDto;
     }

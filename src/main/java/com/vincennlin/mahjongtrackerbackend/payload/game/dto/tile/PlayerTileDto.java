@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,8 +26,11 @@ public class PlayerTileDto {
     @JsonProperty(value = "hand_tiles")
     private PlayerTileGroupDto handTiles;
 
-    @JsonProperty(value = "exposed_tiles")
-    private PlayerTileGroupDto exposedTiles;
+    @JsonProperty(value = "flower_tiles")
+    private PlayerTileGroupDto flowerTiles;
+
+    @JsonProperty(value = "exposed_tile_list")
+    private List<ExposedTileGroupDto> exposedTileList;
 
     @JsonProperty(value = "discarded_tiles")
     private PlayerTileGroupDto discardedTiles;

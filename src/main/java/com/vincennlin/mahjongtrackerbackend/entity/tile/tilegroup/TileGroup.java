@@ -33,6 +33,17 @@ public abstract class TileGroup {
     )
     private List<BoardTile> tiles;
 
+    public void addBoardTileToTileGroup(BoardTile boardTile) {
+        boardTile.setTileGroup(this);
+        tiles.add(boardTile);
+    }
+
+    public BoardTile removeTileFromTileGroup(BoardTile boardTile) {
+        boardTile.setTileGroup(null);
+        tiles.remove(boardTile);
+        return boardTile;
+    }
+
     public String[] convertTilesToString() {
         StringBuilder tilesNumSb = new StringBuilder();
         StringBuilder tilesSubSb = new StringBuilder();
@@ -46,9 +57,31 @@ public abstract class TileGroup {
             tilesNumSb.append(tile.getName().charAt(0));
             if (tile.getName().length() >= 2) {
                 tilesSubSb.append(tile.getName().charAt(1));
+            } else if (tile.getName().length() == 1) {
+                tilesSubSb.append("＝");
             }
             previousTile = tile;
         }
         return new String[]{tilesNumSb.toString(), tilesSubSb.toString()};
+    }
+
+    public BoardTile removeLastBoardTile() {
+        if (tiles.isEmpty()) {
+            return null;
+        }
+        return tiles.remove(tiles.size() - 1);
+    }
+
+    public BoardTile removeFirstBoardTileByTile(Tile tile) {
+        BoardTile boardTileToRemove = tiles.stream()
+                .filter(boardTile -> boardTile.getTile().equals(tile))
+                .findFirst()
+                .orElse(null);
+        if (boardTileToRemove != null) {
+            tiles.remove(boardTileToRemove);
+            return boardTileToRemove;
+        } else {
+            return null;
+        }
     }
 }

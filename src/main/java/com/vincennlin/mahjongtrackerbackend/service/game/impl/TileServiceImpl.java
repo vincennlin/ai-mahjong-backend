@@ -9,6 +9,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.*;
 import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
 import com.vincennlin.mahjongtrackerbackend.exception.WebAPIException;
+import com.vincennlin.mahjongtrackerbackend.payload.board.MeldType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import com.vincennlin.mahjongtrackerbackend.repository.game.*;
@@ -17,6 +18,7 @@ import com.vincennlin.mahjongtrackerbackend.service.game.TileService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +32,7 @@ public class TileServiceImpl implements TileService {
     private final BoardTileRepository boardTileRepository;
     private final WallTileGroupRepository wallTileGroupRepository;
     private final HandTileGroupRepository handTileGroupRepository;
+    private final FlowerTileGroupRepository flowerTileGroupRepository;
     private final ExposedTileGroupRepository exposedTileGroupRepository;
     private final DiscardedTileGroupRepository discardedTileGroupRepository;
     private final PlayerTileRepository playerTileRepository;
@@ -54,8 +57,8 @@ public class TileServiceImpl implements TileService {
             HandTileGroup handTileGroup = new HandTileGroup(playerTile);
             playerTile.setHandTiles(handTileGroupRepository.save(handTileGroup));
 
-            ExposedTileGroup exposedTileGroup = new ExposedTileGroup(playerTile);
-            playerTile.setExposedTiles(exposedTileGroupRepository.save(exposedTileGroup));
+            FlowerTileGroup flowerTileGroup = new FlowerTileGroup(playerTile);
+            playerTile.setFlowerTiles(flowerTileGroupRepository.save(flowerTileGroup));
 
             DiscardedTileGroup discardedTileGroup = new DiscardedTileGroup(playerTile);
             playerTile.setDiscardedTiles(discardedTileGroupRepository.save(discardedTileGroup));
@@ -150,9 +153,8 @@ public class TileServiceImpl implements TileService {
             for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
                 HandTileGroup handTileGroup = playerTileList.get(i).getHandTiles();
                 for (int j = 0; j < 4; j++) {
-                    BoardTile tile = wallTiles.remove(0);
-                    tile.setTileGroup(handTileGroup);
-                    tile.getTileGroup().getTiles().add(tile);
+                    BoardTile boardTile = wallTiles.remove(0);
+                    handTileGroup.addBoardTileToTileGroup(boardTile);
                 }
                 currentPlayer = currentPlayer.getDownwindPlayer();
             }
@@ -189,13 +191,14 @@ public class TileServiceImpl implements TileService {
     @Override
     public void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
-        List<BoardTile> handTiles = playerTile.getHandTiles().getTiles();
-        List<BoardTile> exposedTiles = playerTile.getExposedTiles().getTiles();
+        HandTileGroup handTileGroup = playerTile.getHandTiles();
+        FlowerTileGroup flowerTileGroup = playerTile.getFlowerTiles();
+
+        List<BoardTile> handTiles = handTileGroup.getTiles();
 
         while (handTiles.get(handTiles.size() - 1).getTile().isFlower()) {
-            BoardTile tile = handTiles.remove(handTiles.size() - 1);
-            exposedTiles.add(tile);
-            tile.setTileGroup(playerTile.getExposedTiles());
+            BoardTile tile = handTileGroup.removeLastBoardTile();
+            flowerTileGroup.addBoardTileToTileGroup(tile);
 
             foulHand(playerTile, wallTileGroup);
 
@@ -207,18 +210,29 @@ public class TileServiceImpl implements TileService {
         playerTileRepository.save(playerTile);
     }
 
+    @Transactional
     @Override
     public BoardTile drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
         return drawTileFromWall(playerTile, wallTileGroup, true);
     }
 
+    @Transactional
     @Override
     public BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
         return drawTileFromWall(playerTile, wallTileGroup, false);
     }
 
+    private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {
+
+        BoardTile boardTile = wallTileGroup.drawTileFromWall(isFromHead);
+        playerTile.getHandTiles().addBoardTileToTileGroup(boardTile);
+
+        return boardTileRepository.save(boardTile);
+    }
+
+    @Transactional
     @Override
     public BoardTile discardTile(PlayerTile playerTile, Long boardTileId, Operation operation) {
 
@@ -231,25 +245,46 @@ public class TileServiceImpl implements TileService {
 
         operation.setGamePlayerOperation(GamePlayerOperation.DISCARD);
         operation.setPreviousTileGroup(boardTile.getTileGroup());
+        operation.setBoardTile(boardTile);
 
-        boardTile.setTileGroup(playerTile.getDiscardedTiles());
+        playerTile.getDiscardedTiles().addBoardTileToTileGroup(boardTile);
         BoardTile savedBoardTile = boardTileRepository.save(boardTile);
-
-        playerTile.getDiscardedTiles().getTiles().add(savedBoardTile);
-        operation.setBoardTile(savedBoardTile);
 
         operationService.saveOperation(operation);
 
         return savedBoardTile;
     }
 
-    private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {
+    @Transactional
+    @Override
+    public void pongTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation) {
 
-        List<BoardTile> wallTiles = wallTileGroup.getTiles();
-        BoardTile tile = wallTiles.remove(isFromHead ? 0 : wallTiles.size() - 1);
-        tile.setTileGroup(playerTile.getHandTiles());
-        playerTile.getHandTiles().getTiles().add(tile);
+        BoardTile boardTile = discardedPlayerTile.getDiscardedTiles().removeLastBoardTile();
 
-        return boardTileRepository.save(tile);
+        if (boardTile == null) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Discarded tile is not found");
+        }
+
+        if (!playerTile.getHandTiles().canCallPong(discardedPlayerTile.getGamePlayer(), boardTile.getTile())) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player cannot call pong");
+        }
+
+        operation.setGamePlayerOperation(GamePlayerOperation.CALL_FOR_PONG);
+        operation.setBoardTile(boardTile);
+        operation.setPreviousTileGroup(boardTile.getTileGroup());
+
+        ExposedTileGroup exposedTileGroup = createExposedTileGroup(playerTile, MeldType.PONG);
+        playerTile.pongTile(exposedTileGroup, boardTile);
+
+        saveExposedTileGroup(exposedTileGroup);
+    }
+
+    private ExposedTileGroup createExposedTileGroup(PlayerTile playerTile, MeldType meldType) {
+        ExposedTileGroup exposedTileGroup = new ExposedTileGroup(playerTile, meldType);
+        return exposedTileGroupRepository.save(exposedTileGroup);
+    }
+
+    private void saveExposedTileGroup(ExposedTileGroup exposedTileGroup) {
+        exposedTileGroupRepository.save(exposedTileGroup);
     }
 }
