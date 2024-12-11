@@ -25,6 +25,7 @@ import com.vincennlin.mahjongtrackerbackend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -232,14 +233,12 @@ public class HandServiceImpl implements HandService {
         }
 
         gamePlayerService.setGamePlayerStatus(hand.getDealer(), GamePlayerStatus.THINKING_FOR_DISCARD);
-
-        hand.setStatus(HandStatus.WAITING_FOR_DISCARD);
-
-        Hand savedHand = handRepository.save(hand);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
 
         return getPlayerViewDtoByHandAndGamePlayer(savedHand, getGamePlayerByHandAndCurrentUserId(savedHand));
     }
 
+    @Transactional
     @Override
     public PlayerViewDto discardTile(Long gameId, Long boardTileId) {
 
@@ -283,6 +282,7 @@ public class HandServiceImpl implements HandService {
         return boardMapper.mapToPlayerViewDto(savedHand, savedGamePlayer);
     }
 
+    @Transactional
     @Override
     public PlayerViewDto cancelForCall(Long gameId) {
 
@@ -308,8 +308,8 @@ public class HandServiceImpl implements HandService {
                     }
                     return playerTile.getGamePlayer().getStatus() == GamePlayerStatus.WAITING;
                 })) {
-            hand.setStatus(HandStatus.WAITING_FOR_DRAW);
             hand.setActiveGamePlayer(gamePlayer.getDownwindPlayer());
+            hand = setHandStatus(hand, HandStatus.WAITING_FOR_DRAW);
             gamePlayerService.setGamePlayerStatus(hand.getActiveGamePlayer(), GamePlayerStatus.ABLE_TO_DRAW_TILE);
         }
 
@@ -318,6 +318,7 @@ public class HandServiceImpl implements HandService {
         return boardMapper.mapToPlayerViewDto(savedHand, savedGamePlayer);
     }
 
+    @Transactional
     @Override
     public PlayerViewDto drawTile(Long gameId) {
 
@@ -341,8 +342,7 @@ public class HandServiceImpl implements HandService {
 
         GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
 
-        hand.setStatus(HandStatus.WAITING_FOR_DISCARD);
-        Hand savedHand = handRepository.save(hand);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
 
         return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
     }
@@ -367,6 +367,32 @@ public class HandServiceImpl implements HandService {
         return aiService.generateDiscardAdvice(playerViewDto);
     }
 
+    @Transactional
+    @Override
+    public PlayerViewDto pongTile(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for call state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        if (gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, gamePlayer.getStatus(), "GamePlayer is not in thinking for call state");
+        }
+
+        tileService.pongTile(gamePlayer.getPlayerTile(), hand.getActiveGamePlayer().getPlayerTile(), operationService.createOperation(hand, gamePlayer));
+
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
+
+        hand.setActiveGamePlayer(savedGamePlayer);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
+
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
     private GamePlayer getGamePlayerByHandAndCurrentUserId(Hand hand) {
         return gamePlayerService.getGamePlayerEntityByGameAndUserId(hand.getGame(), userService.getCurrentUserId());
     }
@@ -381,5 +407,10 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, game.getCurrentHand().getStatus(), "GamePlayer does not belong to the game");
         }
         return gamePlayer;
+    }
+
+    private Hand setHandStatus(Hand hand, HandStatus handStatus) {
+        hand.setStatus(handStatus);
+        return handRepository.save(hand);
     }
 }

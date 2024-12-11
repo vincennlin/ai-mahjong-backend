@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,15 +19,17 @@ public class GenerateDiscardAdviceRequestPlayerTile {
 
     GenerateDiscardAdviceRequestPlayerTile(PlayerTileDto playerTileDto) {
         this.handTiles = new GenerateDiscardAdviceRequestTileGroup(playerTileDto.getHandTiles());
-        this.exposedTiles = new GenerateDiscardAdviceRequestTileGroup(playerTileDto.getExposedTiles());
         this.discardedTiles = new GenerateDiscardAdviceRequestTileGroup(playerTileDto.getDiscardedTiles());
+        this.exposedTiles = playerTileDto.getExposedTileList().stream()
+                .map(GenerateDiscardAdviceRequestTileGroup::new)
+                .toList();
     }
 
     @JsonProperty(value = "hand_tiles")
     private GenerateDiscardAdviceRequestTileGroup handTiles;
 
     @JsonProperty(value = "exposed_tiles")
-    private GenerateDiscardAdviceRequestTileGroup exposedTiles;
+    private List<GenerateDiscardAdviceRequestTileGroup> exposedTiles;
 
     @JsonProperty(value = "discarded_tiles")
     private GenerateDiscardAdviceRequestTileGroup discardedTiles;

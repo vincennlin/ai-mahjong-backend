@@ -3,6 +3,7 @@ package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Operation;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.repository.game.OperationRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.OperationService;
 import lombok.AllArgsConstructor;

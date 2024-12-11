@@ -150,4 +150,12 @@ public class HandController implements HandControllerSwagger {
 //
 //        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
 //    }
+
+    @PostMapping("/games/{game_id}/pong-tile")
+    public ResponseEntity<PlayerViewDto> pongTile(@PathVariable(name = "game_id") Long gameId) {
+
+        PlayerViewDto playerViewDto = handService.pongTile(gameId);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
 }
