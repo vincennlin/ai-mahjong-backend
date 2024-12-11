@@ -19,10 +19,11 @@ public class GenerateDiscardAdviceRequestPlayerTile {
 
     GenerateDiscardAdviceRequestPlayerTile(PlayerTileDto playerTileDto) {
         this.handTiles = new GenerateDiscardAdviceRequestTileGroup(playerTileDto.getHandTiles());
-        this.discardedTiles = new GenerateDiscardAdviceRequestTileGroup(playerTileDto.getDiscardedTiles());
         this.exposedTiles = playerTileDto.getExposedTileList().stream()
                 .map(GenerateDiscardAdviceRequestTileGroup::new)
                 .toList();
+        this.flowerTiles = new GenerateDiscardAdviceRequestTileGroup(playerTileDto.getFlowerTiles());
+        this.discardedTiles = new GenerateDiscardAdviceRequestTileGroup(playerTileDto.getDiscardedTiles());
     }
 
     @JsonProperty(value = "hand_tiles")
@@ -30,6 +31,9 @@ public class GenerateDiscardAdviceRequestPlayerTile {
 
     @JsonProperty(value = "exposed_tiles")
     private List<GenerateDiscardAdviceRequestTileGroup> exposedTiles;
+
+    @JsonProperty(value = "flower_tiles")
+    private GenerateDiscardAdviceRequestTileGroup flowerTiles;
 
     @JsonProperty(value = "discarded_tiles")
     private GenerateDiscardAdviceRequestTileGroup discardedTiles;

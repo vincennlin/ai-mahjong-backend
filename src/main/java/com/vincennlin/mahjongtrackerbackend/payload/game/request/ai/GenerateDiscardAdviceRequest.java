@@ -44,7 +44,7 @@ public class GenerateDiscardAdviceRequest {
         return new SystemMessage(
                 "你現在是一個精通臺灣16張麻將的麻將大師，而你的任務是根據收到的麻將牌局，決定你當下該要打哪一張牌。\n" +
                         "接下來你會收到四個玩家的手牌，其中player_tile是你的牌，downwind_player_tile是下家的牌，opposite_player_tile是對家的牌，upwind_player_tile是上家的牌。\n" +
-                        "在這些牌中，hand_tiles代表玩家手牌，exposed_tiles代表玩家門前的牌，discarded_tiles代表玩家所捨出過的牌。\n" +
+                        "在這些牌中，hand_tiles代表玩家手牌，exposed_tiles代表玩家門前的牌，flower_tiles代表玩家的花牌，discarded_tiles代表玩家所捨出過的牌。\n" +
                         "請根據以下基本策略來選擇打牌：\n" +
                         "1. 先打出孤張字牌（東南西北中發白），因為這些牌不能組成順子，且在對手手上可能形成副露。\n" +
                         "2. 如果沒有孤張字牌，打出孤張數字牌（萬筒條），優先打出邊張（1、9）和中洞（2、8）。\n" +
