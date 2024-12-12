@@ -50,10 +50,7 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     }
 
     public int getCountForTile(Tile tile) {
-        if (tile == null) {
-            return 0;
-        }
-        return (int) getTiles().stream().filter(boardTile -> boardTile.getTile().equals(tile)).count();
+        return getTileCountMap().getOrDefault(tile, 0);
     }
 
     private boolean hasTile(Tile tile) {
@@ -62,7 +59,7 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     }
 
     public boolean containsFlowerTile() {
-        return getTiles().stream().anyMatch(BoardTile::isFlower);
+        return getTileCountMap().entrySet().stream().anyMatch(entry -> entry.getKey().isFlower() && entry.getValue() > 0);
     }
 
     public boolean canCall(GamePlayer discardGamePlayer, Tile tile) {

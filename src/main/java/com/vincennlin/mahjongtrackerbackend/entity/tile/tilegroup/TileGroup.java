@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -33,15 +35,64 @@ public abstract class TileGroup {
     )
     private List<BoardTile> tiles;
 
+    @Transient
+    private Map<Tile, Integer> tileCountMap;
+
+    public Map<Tile, Integer> getTileCountMap() {
+        if (tileCountMap == null) {
+            tileCountMap = new HashMap<>();
+            for (BoardTile boardTile : tiles) {
+                Tile tile = boardTile.getTile();
+                tileCountMap.put(tile, tileCountMap.getOrDefault(tile, 0) + 1);
+            }
+        }
+        return tileCountMap;
+    }
+
     public void addBoardTileToTileGroup(BoardTile boardTile) {
         boardTile.setTileGroup(this);
         tiles.add(boardTile);
+        if (tileCountMap != null) {
+            tileCountMap.put(boardTile.getTile(), tileCountMap.getOrDefault(boardTile.getTile(), 0) + 1);
+        }
     }
 
     public BoardTile removeTileFromTileGroup(BoardTile boardTile) {
         boardTile.setTileGroup(null);
         tiles.remove(boardTile);
+        if (tileCountMap != null) {
+            tileCountMap.put(boardTile.getTile(), tileCountMap.getOrDefault(boardTile.getTile(), 0) - 1);
+        }
         return boardTile;
+    }
+
+    public BoardTile removeLastBoardTile() {
+        if (tiles.isEmpty()) {
+            return null;
+        }
+        BoardTile boardTile = tiles.remove(tiles.size() - 1);
+        boardTile.setTileGroup(null);
+        if (tileCountMap != null) {
+            tileCountMap.put(boardTile.getTile(), tileCountMap.getOrDefault(boardTile.getTile(), 0) - 1);
+        }
+        return boardTile;
+    }
+
+    public BoardTile removeFirstBoardTileByTile(Tile tile) {
+        BoardTile boardTileToRemove = tiles.stream()
+                .filter(boardTile -> boardTile.getTile().equals(tile))
+                .findFirst()
+                .orElse(null);
+        if (boardTileToRemove != null) {
+            tiles.remove(boardTileToRemove);
+            boardTileToRemove.setTileGroup(null);
+            if (tileCountMap != null) {
+                tileCountMap.put(boardTileToRemove.getTile(), tileCountMap.getOrDefault(boardTileToRemove.getTile(), 0) - 1);
+            }
+            return boardTileToRemove;
+        } else {
+            return null;
+        }
     }
 
     public String[] convertTilesToString() {
@@ -63,25 +114,5 @@ public abstract class TileGroup {
             previousTile = tile;
         }
         return new String[]{tilesNumSb.toString(), tilesSubSb.toString()};
-    }
-
-    public BoardTile removeLastBoardTile() {
-        if (tiles.isEmpty()) {
-            return null;
-        }
-        return tiles.remove(tiles.size() - 1);
-    }
-
-    public BoardTile removeFirstBoardTileByTile(Tile tile) {
-        BoardTile boardTileToRemove = tiles.stream()
-                .filter(boardTile -> boardTile.getTile().equals(tile))
-                .findFirst()
-                .orElse(null);
-        if (boardTileToRemove != null) {
-            tiles.remove(boardTileToRemove);
-            return boardTileToRemove;
-        } else {
-            return null;
-        }
     }
 }
