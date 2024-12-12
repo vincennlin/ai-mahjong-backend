@@ -36,10 +36,6 @@ public class ExposedTileGroup extends TileGroup implements PlayerTileGroup {
     @Column(name = "meld_type")
     private MeldType meldType;
 
-    public Long getPlayerId() {
-        return playerTile.getGamePlayer().getId();
-    }
-
     public boolean isPongForTile(Tile tile) {
         return meldType == MeldType.PONG
                 && getTiles().size() == 3
