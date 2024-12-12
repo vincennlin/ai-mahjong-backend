@@ -3,6 +3,7 @@ package com.vincennlin.mahjongtrackerbackend.entity.tile;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.*;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -77,6 +78,10 @@ public class PlayerTile {
         } else {
             handTiles.addBoardTileToTileGroup(boardTile);
         }
+    }
+
+    public boolean hasPongMeldForTile(Tile tile) {
+        return exposedTiles.stream().anyMatch(exposedTileGroup -> exposedTileGroup.isPongForTile(tile));
     }
 
     public void pongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {

@@ -113,7 +113,7 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         return getCountForTile(tile) >= 2;
     }
 
-    public boolean canCallKong(GamePlayer discardGamePlayer,Tile tile) {
+    public boolean canCallKong(GamePlayer discardGamePlayer, Tile tile) {
         GamePlayer currentPlayer = getPlayerTile().getGamePlayer();
         if (currentPlayer == discardGamePlayer) {
             return false;
@@ -121,26 +121,19 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         return getCountForTile(tile) == 3;
     }
 
-    public boolean canConcealedKong() {
+    public boolean canCallConcealedKong() {
         return getTiles().stream().anyMatch(boardTile -> getCountForTile(boardTile.getTile()) == 4);
     }
 
-    public Set<GamePlayerOperation> getAcceptableOperations() {
-        Set<GamePlayerOperation> newAcceptableOperations = new HashSet<>();
-        Hand hand = getPlayerTile().getHand();
-        Set<GamePlayerOperation> acceptableOperations = getGamePlayer().getStatus().getAcceptableOperations();
-        for (GamePlayerOperation operation : acceptableOperations) {
-            if (operation == GamePlayerOperation.CALL_FOR_CHOW || operation == GamePlayerOperation.CALL_FOR_PONG || operation == GamePlayerOperation.CALL_FOR_EXPOSED_KONG) {
-                if (operation == GamePlayerOperation.CALL_FOR_CHOW  && canCallChow(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
-                        || operation == GamePlayerOperation.CALL_FOR_PONG && canCallPong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
-                        || operation == GamePlayerOperation.CALL_FOR_EXPOSED_KONG && canCallKong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile())
-                ) {
-                    newAcceptableOperations.add(operation);
-                }
-            } else {
-                newAcceptableOperations.addAll(acceptableOperations);
-            }
-        }
-        return newAcceptableOperations;
+    public boolean canCallAddedKong() {
+        return getTiles().stream().anyMatch(boardTile -> getPlayerTile().hasPongMeldForTile(boardTile.getTile()));
+    }
+
+    public boolean canCallWin() {
+        return false;
+    }
+
+    public boolean canCallSelfDraw() {
+        return false;
     }
 }

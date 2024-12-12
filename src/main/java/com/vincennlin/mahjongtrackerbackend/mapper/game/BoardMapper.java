@@ -61,7 +61,7 @@ public class BoardMapper {
         }
         playerViewDto.setHandStatus(hand.getStatus());
         playerViewDto.setGamePlayerStatus(gamePlayer.getStatus());
-        playerViewDto.setAcceptableOperations(gamePlayer.getPlayerTile().getHandTiles().getAcceptableOperations());
+        playerViewDto.setAcceptableOperations(gamePlayer.getStatus().getAcceptableOperations(hand, gamePlayer));
         playerViewDto.setRoundWind(hand.getRound().getRoundWind());
         playerViewDto.setPrevailingWind(hand.getPrevailingWind());
 
