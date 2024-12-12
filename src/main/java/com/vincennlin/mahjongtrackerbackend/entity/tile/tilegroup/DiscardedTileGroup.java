@@ -21,9 +21,4 @@ public class DiscardedTileGroup extends TileGroup implements PlayerTileGroup {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
-
-    @Override
-    public Long getPlayerId() {
-        return playerTile.getGamePlayer().getId();
-    }
 }

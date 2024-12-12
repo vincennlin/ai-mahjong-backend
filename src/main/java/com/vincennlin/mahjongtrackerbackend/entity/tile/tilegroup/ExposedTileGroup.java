@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.payload.board.MeldType;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,9 @@ public class ExposedTileGroup extends TileGroup implements PlayerTileGroup {
     @Column(name = "meld_type")
     private MeldType meldType;
 
-    public Long getPlayerId() {
-        return playerTile.getGamePlayer().getId();
+    public boolean isPongForTile(Tile tile) {
+        return meldType == MeldType.PONG
+                && getTiles().size() == 3
+                && getTiles().stream().allMatch(boardTile -> boardTile.getTile().equals(tile));
     }
 }

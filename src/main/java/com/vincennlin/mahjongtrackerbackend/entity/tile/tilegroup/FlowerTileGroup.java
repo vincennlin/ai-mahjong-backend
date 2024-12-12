@@ -24,8 +24,4 @@ public class FlowerTileGroup extends TileGroup implements PlayerTileGroup {
     )
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
-
-    public Long getPlayerId() {
-        return playerTile.getGamePlayer().getId();
-    }
 }

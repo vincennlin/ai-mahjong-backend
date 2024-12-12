@@ -1,11 +1,13 @@
 package com.vincennlin.mahjongtrackerbackend.payload.game.status;
 
+import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
+import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import lombok.Getter;
 
+import java.util.HashSet;
 import java.util.Set;
 
-@Getter
 public enum GamePlayerStatus implements ProcessStatus {
     WAITING(),
 
@@ -26,5 +28,15 @@ public enum GamePlayerStatus implements ProcessStatus {
 
     GamePlayerStatus(GamePlayerOperation... acceptableOperations) {
         this.acceptableOperations = Set.of(acceptableOperations);
+    }
+
+    public Set<GamePlayerOperation> getAcceptableOperations(Hand hand, GamePlayer gamePlayer) {
+        Set<GamePlayerOperation> returnOperations = new HashSet<>();
+        for (GamePlayerOperation operation : acceptableOperations) {
+            if (operation.canOperate(hand, gamePlayer.getPlayerTile().getHandTiles())) {
+                returnOperations.add(operation);
+            }
+        }
+        return returnOperations;
     }
 }
