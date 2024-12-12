@@ -46,4 +46,6 @@ public interface HandService {
     DiscardAdviceResponse generateDiscardAdvice(Long gameId);
 
     PlayerViewDto pongTile(Long gameId);
+
+    PlayerViewDto chowTile(Long gameId, int combinationIndex);
 }

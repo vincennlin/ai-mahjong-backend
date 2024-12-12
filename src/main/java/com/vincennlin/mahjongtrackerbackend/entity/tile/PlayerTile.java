@@ -95,4 +95,18 @@ public class PlayerTile {
 
         getExposedTiles().add(exposedTiles);
     }
+
+    public void chowTile(ExposedTileGroup exposedTiles, BoardTile boardTile, List<Tile> chowCombination) {
+        chowCombination.remove(1);
+
+        BoardTile tile1 = handTiles.removeFirstBoardTileByTile(chowCombination.remove(0));
+        exposedTiles.addBoardTileToTileGroup(tile1);
+
+        exposedTiles.addBoardTileToTileGroup(boardTile);
+
+        BoardTile tile2 = handTiles.removeFirstBoardTileByTile(chowCombination.remove(0));
+        exposedTiles.addBoardTileToTileGroup(tile2);
+
+        getExposedTiles().add(exposedTiles);
+    }
 }

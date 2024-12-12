@@ -158,4 +158,13 @@ public class HandController implements HandControllerSwagger {
 
         return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
     }
+
+    @PostMapping("/games/{game_id}/chow-tile/{combination_index}")
+    public ResponseEntity<PlayerViewDto> chowTile(@PathVariable(name = "game_id") Long gameId,
+                                                  @PathVariable(name = "combination_index") int combinationIndex) {
+
+        PlayerViewDto playerViewDto = handService.chowTile(gameId, combinationIndex);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
 }

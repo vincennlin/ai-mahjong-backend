@@ -280,6 +280,50 @@ public class TileServiceImpl implements TileService {
         saveExposedTileGroup(exposedTileGroup);
     }
 
+    @Transactional
+    @Override
+    public void chowTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation, int combinationIndex) {
+
+        BoardTile boardTile = discardedPlayerTile.getDiscardedTiles().removeLastBoardTile();
+
+        if (boardTile == null) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Discarded tile is not found");
+        }
+
+        if (!playerTile.getHandTiles().canCallChow(discardedPlayerTile.getGamePlayer(), boardTile.getTile())) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player cannot call chow");
+        }
+
+        List<List<Tile>> chowCombinations = playerTile.getHandTiles().getChowCombinations(boardTile.getTile());
+
+        List<Tile> chowCombination;
+
+        if (chowCombinations.size() < 2) {
+            if (combinationIndex != 0) {
+                throw new WebAPIException(HttpStatus.BAD_REQUEST, "Invalid chow combination index");
+            }
+            chowCombination = chowCombinations.get(0);
+        } else {
+            if (combinationIndex < 1 || combinationIndex > chowCombinations.size()) {
+                throw new WebAPIException(HttpStatus.BAD_REQUEST, "Invalid chow combination index");
+            }
+            chowCombination = chowCombinations.get(combinationIndex - 1);
+        }
+
+        if (chowCombination.size() != 3 || chowCombination.get(1) != boardTile.getTile()) {
+            throw new WebAPIException(HttpStatus.INTERNAL_SERVER_ERROR, "Chow combination is not correct");
+        }
+
+        operation.setGamePlayerOperation(GamePlayerOperation.CALL_FOR_CHOW);
+        operation.setBoardTile(boardTile);
+        operation.setPreviousTileGroup(boardTile.getTileGroup());
+
+        ExposedTileGroup exposedTileGroup = createExposedTileGroup(playerTile, MeldType.CHOW);
+        playerTile.chowTile(exposedTileGroup, boardTile, chowCombination);
+
+        saveExposedTileGroup(exposedTileGroup);
+    }
+
     private ExposedTileGroup createExposedTileGroup(PlayerTile playerTile, MeldType meldType) {
         ExposedTileGroup exposedTileGroup = new ExposedTileGroup(playerTile, meldType);
         return exposedTileGroupRepository.save(exposedTileGroup);

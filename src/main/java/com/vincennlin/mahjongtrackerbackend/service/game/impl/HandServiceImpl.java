@@ -393,6 +393,32 @@ public class HandServiceImpl implements HandService {
         return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
     }
 
+    @Transactional
+    @Override
+    public PlayerViewDto chowTile(Long gameId, int combinationIndex) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for call state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        if (gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, gamePlayer.getStatus(), "GamePlayer is not in thinking for call state");
+        }
+
+        tileService.chowTile(gamePlayer.getPlayerTile(), hand.getActiveGamePlayer().getPlayerTile(), operationService.createOperation(hand, gamePlayer), combinationIndex);
+
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
+
+        hand.setActiveGamePlayer(savedGamePlayer);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
+
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
     private GamePlayer getGamePlayerByHandAndCurrentUserId(Hand hand) {
         return gamePlayerService.getGamePlayerEntityByGameAndUserId(hand.getGame(), userService.getCurrentUserId());
     }

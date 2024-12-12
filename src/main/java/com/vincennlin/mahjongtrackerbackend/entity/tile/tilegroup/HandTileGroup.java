@@ -115,8 +115,8 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         if (canCallLeftEdgeChow(tile) || canCallLeftDoubleSidedChow(tile)) {
             List<Tile> combination = new ArrayList<>();
             combination.add(tile.getPreviousTile().getPreviousTile());
-            combination.add(tile.getPreviousTile());
             combination.add(tile);
+            combination.add(tile.getPreviousTile());
             chowCombinations.add(combination);
         }
 
@@ -130,8 +130,8 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
 
         if (canCallRightDoubleSidedChow(tile) || canCallRightEdgeChow(tile)) {
             List<Tile> combination = new ArrayList<>();
-            combination.add(tile);
             combination.add(tile.getNextTile());
+            combination.add(tile);
             combination.add(tile.getNextTile().getNextTile());
             chowCombinations.add(combination);
         }
