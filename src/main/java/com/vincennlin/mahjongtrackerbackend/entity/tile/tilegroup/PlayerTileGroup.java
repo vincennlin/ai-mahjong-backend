@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup;
 
+import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 
@@ -10,6 +11,10 @@ public interface PlayerTileGroup {
     List<BoardTile> getTiles();
 
     PlayerTile getPlayerTile();
+
+    default GamePlayer getGamePlayer() {
+        return getPlayerTile().getGamePlayer();
+    }
 
     default Long getPlayerId() {
         return getPlayerTile().getGamePlayer().getId();

@@ -1,10 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
-import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
-import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
-import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.TileComparator;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
@@ -13,9 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.ArrayList;
+import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
@@ -36,21 +32,12 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
 
-    @Override
-    public Long getPlayerId() {
-        return playerTile.getGamePlayer().getId();
-    }
-
-    public GamePlayer getGamePlayer() {
-        return playerTile.getGamePlayer();
+    public int getCountForTile(Tile tile) {
+        return getTileCountMap().getOrDefault(tile, 0);
     }
 
     public void sortHandTiles() {
         getTiles().sort(new TileComparator());
-    }
-
-    public int getCountForTile(Tile tile) {
-        return getTileCountMap().getOrDefault(tile, 0);
     }
 
     private boolean hasTile(Tile tile) {
@@ -79,27 +66,11 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         if (currentPlayer == discardGamePlayer || discardGamePlayer != getPlayerTile().getGamePlayer().getUpwindPlayer() || !tile.isSuit()) {
             return false;
         }
+        return canCallChow(tile);
+    }
+
+    private boolean canCallChow(Tile tile) {
         return canCallDoubleSidedChow(tile) || canCallEdgeChow(tile) || canCallInsideStraightChow(tile);
-    }
-
-    public boolean canCallInsideStraightChow(Tile tile) {
-        if (tile.getRank() < 2 || tile.getRank() > 8) {
-            return false;
-        }
-        return hasTile(tile.getPreviousTile()) && hasTile(tile.getNextTile());
-    }
-
-    public boolean canCallEdgeChow(Tile tile) {
-        if (tile.getRank() != 3 && tile.getRank() != 7) {
-            return false;
-        }
-        return (tile.getRank() == 3 && hasTile(tile.getPreviousTile()) && hasTile(tile.getPreviousTile().getPreviousTile()) ||
-                (tile.getRank() == 7 && hasTile(tile.getNextTile()) && hasTile(tile.getNextTile().getNextTile())));
-    }
-
-    public boolean canCallDoubleSidedChow(Tile tile) {
-        return (tile.getRank() > 2 && (tile.getPreviousTile() != null  && hasTile(tile.getPreviousTile()) && hasTile(tile.getPreviousTile().getPreviousTile()) ||
-                (tile.getRank() < 8 && (tile.getNextTile() != null  && hasTile(tile.getNextTile()) && hasTile(tile.getNextTile().getNextTile())))));
     }
 
     public boolean canCallPong(GamePlayer discardGamePlayer, Tile tile) {
@@ -132,5 +103,70 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
 
     public boolean canCallSelfDraw() {
         return false;
+    }
+
+    public List<List<Tile>> getChowCombinations(Tile tile) {
+        if (!canCallChow(tile)) {
+            return null;
+        }
+
+        List<List<Tile>> chowCombinations = new ArrayList<>();
+
+        if (canCallLeftEdgeChow(tile) || canCallLeftDoubleSidedChow(tile)) {
+            List<Tile> combination = new ArrayList<>();
+            combination.add(tile.getPreviousTile().getPreviousTile());
+            combination.add(tile.getPreviousTile());
+            combination.add(tile);
+            chowCombinations.add(combination);
+        }
+
+        if (canCallInsideStraightChow(tile)) {
+            List<Tile> combination = new ArrayList<>();
+            combination.add(tile.getPreviousTile());
+            combination.add(tile);
+            combination.add(tile.getNextTile());
+            chowCombinations.add(combination);
+        }
+
+        if (canCallRightDoubleSidedChow(tile) || canCallRightEdgeChow(tile)) {
+            List<Tile> combination = new ArrayList<>();
+            combination.add(tile);
+            combination.add(tile.getNextTile());
+            combination.add(tile.getNextTile().getNextTile());
+            chowCombinations.add(combination);
+        }
+
+        return chowCombinations;
+    }
+
+    private boolean canCallInsideStraightChow(Tile tile) {
+        if (tile.getRank() == 1 || tile.getRank() == 9) {
+            return false;
+        }
+        return hasTile(tile.getPreviousTile()) && hasTile(tile.getNextTile());
+    }
+
+    private boolean canCallEdgeChow(Tile tile) {
+        return canCallLeftEdgeChow(tile) || canCallRightEdgeChow(tile);
+    }
+
+    private boolean canCallDoubleSidedChow(Tile tile) {
+        return canCallLeftDoubleSidedChow(tile) || canCallRightDoubleSidedChow(tile);
+    }
+
+    private boolean canCallLeftEdgeChow(Tile tile) {
+        return tile.getRank() == 3 && hasTile(tile.getPreviousTile()) && hasTile(tile.getPreviousTile().getPreviousTile());
+    }
+
+    private boolean canCallRightEdgeChow(Tile tile) {
+        return tile.getRank() == 7 && hasTile(tile.getNextTile()) && hasTile(tile.getNextTile().getNextTile());
+    }
+
+    private boolean canCallLeftDoubleSidedChow(Tile tile) {
+        return tile.getRank() > 3 && tile.getPreviousTile() != null && hasTile(tile.getPreviousTile()) && hasTile(tile.getPreviousTile().getPreviousTile());
+    }
+
+    private boolean canCallRightDoubleSidedChow(Tile tile) {
+        return tile.getRank() < 7 && tile.getNextTile() != null && hasTile(tile.getNextTile()) && hasTile(tile.getNextTile().getNextTile());
     }
 }

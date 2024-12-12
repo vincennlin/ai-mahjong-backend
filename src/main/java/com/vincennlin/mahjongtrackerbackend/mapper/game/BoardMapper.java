@@ -5,12 +5,19 @@ import com.vincennlin.mahjongtrackerbackend.entity.game.Hand;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.mapper.tile.BoardTileMapper;
 import com.vincennlin.mahjongtrackerbackend.mapper.tile.TileGroupMapper;
+import com.vincennlin.mahjongtrackerbackend.mapper.tile.TileMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.TileDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class BoardMapper {
@@ -18,6 +25,7 @@ public class BoardMapper {
     private final ModelMapper modelMapper;
     private final TileGroupMapper tileGroupMapper;
     private final BoardTileMapper boardTileMapper;
+    private final TileMapper tileMapper;
 
     public BoardMapper() {
         this.modelMapper = new ModelMapper();
@@ -25,6 +33,7 @@ public class BoardMapper {
 
         this.tileGroupMapper = new TileGroupMapper();
         this.boardTileMapper = new BoardTileMapper();
+        this.tileMapper = new TileMapper();
     }
 
     public BoardDto mapToDto(Hand hand) {
@@ -52,16 +61,30 @@ public class BoardMapper {
     }
 
     public PlayerViewDto mapToPlayerViewDto(Hand hand, GamePlayer gamePlayer) {
+
         PlayerViewDto playerViewDto = new PlayerViewDto();
+
         playerViewDto.setGameId(hand.getGame().getId());
         playerViewDto.setHandId(hand.getId());
         playerViewDto.setActiveGamePlayerId(hand.getActiveGamePlayer().getId());
+
         if (hand.getLastDiscardedTile() != null) {
             playerViewDto.setLastDiscardedTile(boardTileMapper.mapToDto(hand.getLastDiscardedTile()));
         }
+
         playerViewDto.setHandStatus(hand.getStatus());
         playerViewDto.setGamePlayerStatus(gamePlayer.getStatus());
+
         playerViewDto.setAcceptableOperations(gamePlayer.getStatus().getAcceptableOperations(hand, gamePlayer));
+        if (playerViewDto.getAcceptableOperations().contains(GamePlayerOperation.CALL_FOR_CHOW)) {
+            List<List<Tile>> chowCombinations = gamePlayer.getPlayerTile().getHandTiles().getChowCombinations(hand.getLastDiscardedTile().getTile());
+            List<List<TileDto>> chowCombinationsDto = new ArrayList<>();
+            for (List<Tile> chowCombination : chowCombinations) {
+                chowCombinationsDto.add(tileMapper.mapTilesToDtoList(chowCombination));
+            }
+            playerViewDto.setChowCombinations(chowCombinationsDto);
+        }
+
         playerViewDto.setRoundWind(hand.getRound().getRoundWind());
         playerViewDto.setPrevailingWind(hand.getPrevailingWind());
 

@@ -1,8 +1,10 @@
 package com.vincennlin.mahjongtrackerbackend.payload.game.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.BoardTileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.PlayerTileDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.TileDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.WallTileGroupDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
@@ -13,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -42,14 +45,15 @@ public class PlayerViewDto {
     @JsonProperty(value = "hand_status")
     private HandStatus handStatus;
 
-//    @JsonProperty(value = "acceptable_operations")
-//    private Set<HandOperation> acceptableOperations;
-
     @JsonProperty(value = "game_player_status")
     private GamePlayerStatus gamePlayerStatus;
 
     @JsonProperty(value = "acceptable_operations")
     private Set<GamePlayerOperation> acceptableOperations;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(value = "chow_combinations")
+    private List<List<TileDto>> chowCombinations;
 
     @JsonProperty(value = "player_tile")
     private PlayerTileDto playerTile;
