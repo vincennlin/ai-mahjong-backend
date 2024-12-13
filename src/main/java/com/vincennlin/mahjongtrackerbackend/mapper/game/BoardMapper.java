@@ -67,9 +67,10 @@ public class BoardMapper {
         playerViewDto.setGameId(hand.getGame().getId());
         playerViewDto.setHandId(hand.getId());
         playerViewDto.setActiveGamePlayerId(hand.getActiveGamePlayer().getId());
-        playerViewDto.setOppositePlayerId(gamePlayer.getOppositePlayer().getId());
-        playerViewDto.setUpwindPlayerId(gamePlayer.getUpwindPlayer().getId());
-        playerViewDto.setDownwindPlayerId(gamePlayer.getDownwindPlayer().getId());
+        playerViewDto.setSelfGamePlayerId(gamePlayer.getId());
+        playerViewDto.setDownwindGamePlayerId(gamePlayer.getDownwindPlayer().getId());
+        playerViewDto.setOppositeGamePlayerId(gamePlayer.getOppositePlayer().getId());
+        playerViewDto.setUpwindGamePlayerId(gamePlayer.getUpwindPlayer().getId());
 
         if (hand.getLastDiscardedTile() != null) {
             playerViewDto.setLastDiscardedTile(boardTileMapper.mapToDto(hand.getLastDiscardedTile()));
