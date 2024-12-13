@@ -63,7 +63,7 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
 
     public boolean canCallChow(GamePlayer discardGamePlayer, Tile tile) {
         GamePlayer currentPlayer = getGamePlayer();
-        if (currentPlayer == discardGamePlayer || discardGamePlayer != getPlayerTile().getGamePlayer().getUpwindPlayer() || !tile.isSuit()) {
+        if (currentPlayer == discardGamePlayer || discardGamePlayer != currentPlayer.getUpwindPlayer() || !tile.isSuit()) {
             return false;
         }
         return canCallChow(tile);

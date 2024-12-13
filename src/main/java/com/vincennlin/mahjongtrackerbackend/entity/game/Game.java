@@ -14,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -89,11 +90,11 @@ public class Game {
 
     private Map<GamePlayer, PlayerTile> getGamePlayerPlayerTileMap() {
         if (gamePlayerPlayerTileMap == null) {
-            List<PlayerTile> playerTiles = getCurrentHand().getPlayerTiles();
-            gamePlayerPlayerTileMap = gamePlayers.stream()
-                    .collect(Collectors.toMap(gamePlayer -> gamePlayer, gamePlayer -> playerTiles.stream()
-                            .filter(playerTile -> playerTile.getGamePlayer().equals(gamePlayer))
-                            .findFirst().get()));
+            gamePlayerPlayerTileMap = new HashMap<>();
+            for (GamePlayer gamePlayer : getGamePlayers()) {
+                gamePlayerPlayerTileMap.put(gamePlayer,
+                        getCurrentHand().getPlayerTileByGamePlayer(gamePlayer));
+            }
         }
         return gamePlayerPlayerTileMap;
     }

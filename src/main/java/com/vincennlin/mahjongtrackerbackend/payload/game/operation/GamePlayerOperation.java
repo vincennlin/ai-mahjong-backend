@@ -11,25 +11,25 @@ public enum GamePlayerOperation implements GamePlayerOperationInterface {
     CALL_FOR_CHOW(GamePlayerStatus.THINKING_FOR_DISCARD) {
         @Override
         public boolean canOperate(Hand hand, GamePlayer gamePlayer) {
-            return gamePlayer.getHandTiles().canCallChow(gamePlayer, hand.getLastDiscardedTile().getTile());
+            return gamePlayer.getHandTiles().canCallChow(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile());
         }
     },
     CALL_FOR_PONG(GamePlayerStatus.THINKING_FOR_DISCARD) {
         @Override
         public boolean canOperate(Hand hand, GamePlayer gamePlayer) {
-            return gamePlayer.getHandTiles().canCallPong(gamePlayer, hand.getLastDiscardedTile().getTile());
+            return gamePlayer.getHandTiles().canCallPong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile());
         }
     },
     CALL_FOR_EXPOSED_KONG(GamePlayerStatus.THINKING_FOR_DISCARD) {
         @Override
         public boolean canOperate(Hand hand, GamePlayer gamePlayer) {
-            return gamePlayer.getHandTiles().canCallKong(gamePlayer, hand.getLastDiscardedTile().getTile());
+            return gamePlayer.getHandTiles().canCallKong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile());
         }
     },
     CANCEL(GamePlayerStatus.WAITING) {
         @Override
         public boolean canOperate(Hand hand, GamePlayer gamePlayer) {
-            return gamePlayer.getHandTiles().canCall(gamePlayer, hand.getLastDiscardedTile().getTile());
+            return gamePlayer.getHandTiles().canCall(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile());
         }
     },
 

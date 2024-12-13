@@ -72,8 +72,12 @@ public class GamePlayer {
         return game.getGamePlayers().indexOf(this);
     }
 
+    public GamePlayer getOppositePlayer() {
+        return getDownwindPlayer().getDownwindPlayer();
+    }
+
     public GamePlayer getUpwindPlayer() {
-        return getDownwindPlayer().getDownwindPlayer().getDownwindPlayer();
+        return getOppositePlayer().getDownwindPlayer();
     }
 
     public PlayerTile getPlayerTile() {
