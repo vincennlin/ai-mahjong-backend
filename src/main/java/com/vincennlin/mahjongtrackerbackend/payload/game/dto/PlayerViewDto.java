@@ -39,17 +39,17 @@ public class PlayerViewDto {
     @JsonProperty(value = "active_game_player_id")
     private Long activeGamePlayerId;
 
-    @JsonProperty(value = "opposite_player_id")
-    private Long oppositePlayerId;
+    @JsonProperty(value = "self_game_player_id")
+    private Long selfGamePlayerId;
 
-    @JsonProperty(value = "upwind_player_id")
-    private Long upwindPlayerId;
+    @JsonProperty(value = "downwind_game_player_id")
+    private Long downwindGamePlayerId;
 
-    @JsonProperty(value = "downwind_player_id")
-    private Long downwindPlayerId;
+    @JsonProperty(value = "opposite_game_player_id")
+    private Long oppositeGamePlayerId;
 
-    @JsonProperty(value = "last_discarded_tile")
-    private BoardTileDto lastDiscardedTile;
+    @JsonProperty(value = "upwind_game_player_id")
+    private Long upwindGamePlayerId;
 
     @JsonProperty(value = "hand_status")
     private HandStatus handStatus;
@@ -59,6 +59,9 @@ public class PlayerViewDto {
 
     @JsonProperty(value = "acceptable_operations")
     private Set<GamePlayerOperation> acceptableOperations;
+
+    @JsonProperty(value = "last_discarded_tile")
+    private BoardTileDto lastDiscardedTile;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "chow_combinations")
