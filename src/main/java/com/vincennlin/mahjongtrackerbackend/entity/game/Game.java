@@ -1,5 +1,6 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
@@ -14,6 +15,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -80,6 +83,24 @@ public class Game {
     @CreationTimestamp
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
+
+    @Transient
+    private Map<GamePlayer, PlayerTile> gamePlayerPlayerTileMap;
+
+    private Map<GamePlayer, PlayerTile> getGamePlayerPlayerTileMap() {
+        if (gamePlayerPlayerTileMap == null) {
+            List<PlayerTile> playerTiles = getCurrentHand().getPlayerTiles();
+            gamePlayerPlayerTileMap = gamePlayers.stream()
+                    .collect(Collectors.toMap(gamePlayer -> gamePlayer, gamePlayer -> playerTiles.stream()
+                            .filter(playerTile -> playerTile.getGamePlayer().equals(gamePlayer))
+                            .findFirst().get()));
+        }
+        return gamePlayerPlayerTileMap;
+    }
+
+    public PlayerTile getPlayerTileByGamePlayer(GamePlayer gamePlayer) {
+        return getGamePlayerPlayerTileMap().get(gamePlayer);
+    }
 
     public boolean containsPlayerById(Long playerId) {
         return gamePlayers.stream()

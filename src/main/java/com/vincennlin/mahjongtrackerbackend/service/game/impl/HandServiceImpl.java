@@ -308,7 +308,7 @@ public class HandServiceImpl implements HandService {
                     }
                     return playerTile.getGamePlayer().getStatus() == GamePlayerStatus.WAITING;
                 })) {
-            hand.setActiveGamePlayer(gamePlayer.getDownwindPlayer());
+            hand.setActiveGamePlayer(hand.getActiveGamePlayer().getDownwindPlayer());
             hand = setHandStatus(hand, HandStatus.WAITING_FOR_DRAW);
             gamePlayerService.setGamePlayerStatus(hand.getActiveGamePlayer(), GamePlayerStatus.ABLE_TO_DRAW_TILE);
         }
