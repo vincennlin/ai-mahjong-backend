@@ -39,6 +39,15 @@ public class PlayerViewDto {
     @JsonProperty(value = "active_game_player_id")
     private Long activeGamePlayerId;
 
+    @JsonProperty(value = "opposite_player_id")
+    private Long oppositePlayerId;
+
+    @JsonProperty(value = "upwind_player_id")
+    private Long upwindPlayerId;
+
+    @JsonProperty(value = "downwind_player_id")
+    private Long downwindPlayerId;
+
     @JsonProperty(value = "last_discarded_tile")
     private BoardTileDto lastDiscardedTile;
 
