@@ -33,7 +33,7 @@ public enum GamePlayerStatus implements ProcessStatus {
     public Set<GamePlayerOperation> getAcceptableOperations(Hand hand, GamePlayer gamePlayer) {
         Set<GamePlayerOperation> returnOperations = new HashSet<>();
         for (GamePlayerOperation operation : acceptableOperations) {
-            if (operation.canOperate(hand, gamePlayer.getPlayerTile().getHandTiles())) {
+            if (operation.canOperate(hand, gamePlayer)) {
                 returnOperations.add(operation);
             }
         }
