@@ -6,7 +6,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.PlayerMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.PlayerPageResponse;
-import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreatePlayerRequest;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.player.CreatePlayerRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerDto;
 import com.vincennlin.mahjongtrackerbackend.repository.game.PlayerRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.PlayerService;
@@ -65,7 +65,7 @@ public class PlayerServiceImpl implements PlayerService {
         Player player = new Player();
         player.setType(request.getType());
 
-        User user = authService.getCurrentUser();
+        User user = request.getUser();
         player.setUser(user);
 
         if (request.getPlayerName() != null) {

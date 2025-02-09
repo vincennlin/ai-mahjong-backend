@@ -1,5 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
+import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
+import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.user.User;
 import com.vincennlin.mahjongtrackerbackend.payload.game.wind.Wind;
@@ -12,7 +14,10 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -80,9 +85,32 @@ public class Game {
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
+    @Transient
+    private Map<GamePlayer, PlayerTile> gamePlayerPlayerTileMap;
+
+    private Map<GamePlayer, PlayerTile> getGamePlayerPlayerTileMap() {
+        if (gamePlayerPlayerTileMap == null) {
+            gamePlayerPlayerTileMap = new HashMap<>();
+            for (GamePlayer gamePlayer : getGamePlayers()) {
+                gamePlayerPlayerTileMap.put(gamePlayer,
+                        getCurrentHand().getPlayerTileByGamePlayer(gamePlayer));
+            }
+        }
+        return gamePlayerPlayerTileMap;
+    }
+
+    public PlayerTile getPlayerTileByGamePlayer(GamePlayer gamePlayer) {
+        return getGamePlayerPlayerTileMap().get(gamePlayer);
+    }
+
     public boolean containsPlayerById(Long playerId) {
         return gamePlayers.stream()
                 .anyMatch(gamePlayer -> gamePlayer.getPlayer().getId().equals(playerId));
+    }
+
+    public boolean containsUserById(Long userId) {
+        return gamePlayers.stream()
+                .anyMatch(gamePlayer -> gamePlayer.getPlayer().getUser().getId().equals(userId));
     }
 
     public Wind getNextRoundWind() {
@@ -105,7 +133,8 @@ public class Game {
 
     public GamePlayer getGamePlayerByUserId(Long userId) {
         return gamePlayers.stream()
-                .filter(gamePlayer -> gamePlayer.getPlayer().getId().equals(userId))
+                .filter(gamePlayer -> gamePlayer.getPlayer().getUser().getId().equals(userId)
+                        && gamePlayer.getPlayer().getType() == PlayerType.HUMAN)
                 .findFirst()
                 .orElse(null);
     }

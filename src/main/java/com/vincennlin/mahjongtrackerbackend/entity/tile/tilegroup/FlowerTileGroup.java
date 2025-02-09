@@ -10,15 +10,18 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "discarded_tile_groups")
-public class DiscardedTileGroup extends TileGroup implements PlayerTileGroup {
+@Table(name = "flower_tile_groups")
+public class FlowerTileGroup extends TileGroup implements PlayerTileGroup {
 
-    public DiscardedTileGroup(PlayerTile playerTile) {
+    public FlowerTileGroup(PlayerTile playerTile) {
         super();
         this.playerTile = playerTile;
     }
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
 }

@@ -1,6 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.game;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.HandTileGroup;
 import com.vincennlin.mahjongtrackerbackend.exception.InternalGameError;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import jakarta.persistence.*;
@@ -71,15 +72,19 @@ public class GamePlayer {
         return game.getGamePlayers().indexOf(this);
     }
 
+    public GamePlayer getOppositePlayer() {
+        return getDownwindPlayer().getDownwindPlayer();
+    }
+
     public GamePlayer getUpwindPlayer() {
-        return getDownwindPlayer().getDownwindPlayer().getDownwindPlayer();
+        return getOppositePlayer().getDownwindPlayer();
     }
 
     public PlayerTile getPlayerTile() {
-        List<PlayerTile> playerTiles = game.getCurrentHand().getPlayerTiles();
-        return playerTiles.stream()
-                .filter(playerTile -> playerTile.getGamePlayer().equals(this))
-                .findFirst()
-                .orElseThrow(() -> new InternalGameError(HttpStatus.INTERNAL_SERVER_ERROR, "Player tile not found"));
+        return game.getPlayerTileByGamePlayer(this);
+    }
+
+    public HandTileGroup getHandTiles() {
+        return getPlayerTile().getHandTiles();
     }
 }

@@ -5,6 +5,7 @@ import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.ai.DiscardAdviceResponse;
 
 import java.util.List;
 
@@ -34,9 +35,17 @@ public interface HandService {
 
     BoardDto breakWall(Long gameId);
 
-    BoardDto initialFoulHand(Long gameId);
+    PlayerViewDto initialFoulHand(Long gameId);
 
-    BoardDto discardTile(Long gameId, Long gamePlayerId, Long boardTileId);
+    PlayerViewDto discardTile(Long gameId, Long boardTileId);
 
-    PlayerViewDto cancelForCall(Long gameId, Long gamePlayerId);
+    PlayerViewDto cancelForCall(Long gameId);
+
+    PlayerViewDto drawTile(Long gameId);
+
+    DiscardAdviceResponse generateDiscardAdvice(Long gameId);
+
+    PlayerViewDto pongTile(Long gameId);
+
+    PlayerViewDto chowTile(Long gameId, int combinationIndex);
 }

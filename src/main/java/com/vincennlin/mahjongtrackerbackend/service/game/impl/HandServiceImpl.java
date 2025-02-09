@@ -14,6 +14,7 @@ import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.ai.DiscardAdviceResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.HandStatus;
@@ -24,6 +25,7 @@ import com.vincennlin.mahjongtrackerbackend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class HandServiceImpl implements HandService {
     private final TileService tileService;
     private final GamePlayerService gamePlayerService;
     private final OperationService operationService;
+    private final AiService aiService;
 
     private final HandRepository handRepository;
 
@@ -207,7 +210,7 @@ public class HandServiceImpl implements HandService {
     }
 
     @Override
-    public BoardDto initialFoulHand(Long gameId) {
+    public PlayerViewDto initialFoulHand(Long gameId) {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
@@ -215,7 +218,7 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in finished breaking wall state");
         }
 
-        GamePlayer currentPlayer = getCurrentHandEntityByGameId(gameId).getDealer();
+        GamePlayer currentPlayer = hand.getDealer();
 
         while (hand.getPlayerTiles().stream().anyMatch(
                 playerTile -> playerTile.getHandTiles().containsFlowerTile())) {
@@ -229,13 +232,15 @@ public class HandServiceImpl implements HandService {
             }
         }
 
-        hand.setStatus(HandStatus.WAITING_FOR_DISCARD);
+        gamePlayerService.setGamePlayerStatus(hand.getDealer(), GamePlayerStatus.THINKING_FOR_DISCARD);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
 
-        return boardMapper.mapToDto(handRepository.save(hand));
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, getGamePlayerByHandAndCurrentUserId(savedHand));
     }
 
+    @Transactional
     @Override
-    public BoardDto discardTile(Long gameId, Long gamePlayerId, Long boardTileId) {
+    public PlayerViewDto discardTile(Long gameId, Long boardTileId) {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
@@ -243,15 +248,9 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for discard state");
         }
 
-        GamePlayer gamePlayer = null;
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
 
-        if (gamePlayerId == null) {
-            gamePlayer = gamePlayerService.getGamePlayerEntityByGameAndUserId(hand.getRound().getGame(), userService.getCurrentUserId());
-        } else {
-            gamePlayer = getGamePlayerByGameAndGamePlayerId(hand.getRound().getGame(), gamePlayerId);
-        }
-
-        if (hand.getActiveGamePlayer() != gamePlayer) {
+        if (hand.getActiveGamePlayer() != gamePlayer || gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_DISCARD) {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "It is not the current player's turn");
         }
 
@@ -270,15 +269,22 @@ public class HandServiceImpl implements HandService {
             }
         }
 
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.WAITING);
+
         if (hand.getStatus() != HandStatus.WAITING_FOR_CALL) {
             hand.setStatus(HandStatus.WAITING_FOR_DRAW);
+            hand.setActiveGamePlayer(gamePlayer.getDownwindPlayer());
+            gamePlayerService.setGamePlayerStatus(gamePlayer.getDownwindPlayer(), GamePlayerStatus.ABLE_TO_DRAW_TILE);
         }
 
-        return boardMapper.mapToDto(handRepository.save(hand));
+        Hand savedHand = handRepository.save(hand);
+
+        return boardMapper.mapToPlayerViewDto(savedHand, savedGamePlayer);
     }
 
+    @Transactional
     @Override
-    public PlayerViewDto cancelForCall(Long gameId, Long gamePlayerId) {
+    public PlayerViewDto cancelForCall(Long gameId) {
 
         Hand hand = getCurrentHandEntityByGameId(gameId);
 
@@ -286,13 +292,13 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for call state");
         }
 
-        GamePlayer gamePlayer = getGamePlayerByGameAndGamePlayerId(hand.getRound().getGame(), gamePlayerId);
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
 
         if (gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_CALL) {
             throw new ProcessException(HttpStatus.BAD_REQUEST, gamePlayer.getStatus(), "GamePlayer is not in thinking for call state");
         }
 
-        gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.WAITING);
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.WAITING);
 
         if (hand.getPlayerTiles().stream().allMatch(
                 playerTile -> {
@@ -302,11 +308,123 @@ public class HandServiceImpl implements HandService {
                     }
                     return playerTile.getGamePlayer().getStatus() == GamePlayerStatus.WAITING;
                 })) {
-            hand.setStatus(HandStatus.WAITING_FOR_DRAW);
-            gamePlayerService.setGamePlayerStatus(hand.getActiveGamePlayer().getDownwindPlayer(), GamePlayerStatus.ABLE_TO_DRAW_TILE);
+            hand.setActiveGamePlayer(hand.getActiveGamePlayer().getDownwindPlayer());
+            hand = setHandStatus(hand, HandStatus.WAITING_FOR_DRAW);
+            gamePlayerService.setGamePlayerStatus(hand.getActiveGamePlayer(), GamePlayerStatus.ABLE_TO_DRAW_TILE);
         }
 
-        return boardMapper.mapToPlayerViewDto(handRepository.save(hand), gamePlayer);
+        Hand savedHand = handRepository.save(hand);
+
+        return boardMapper.mapToPlayerViewDto(savedHand, savedGamePlayer);
+    }
+
+    @Transactional
+    @Override
+    public PlayerViewDto drawTile(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_DRAW) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for draw state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        if (hand.getActiveGamePlayer() != gamePlayer && gamePlayer.getStatus() != GamePlayerStatus.ABLE_TO_DRAW_TILE) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "It is not the current player's turn");
+        }
+
+        BoardTile drawnTile = tileService.drawTile(gamePlayer.getPlayerTile(), hand.getWallTileGroup());
+
+        while (drawnTile.isFlower()) {
+            drawnTile = tileService.foulHand(gamePlayer.getPlayerTile(), hand.getWallTileGroup());
+        }
+
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
+
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
+
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
+    @Override
+    public DiscardAdviceResponse generateDiscardAdvice(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_DISCARD) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for discard state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        if (hand.getActiveGamePlayer() != gamePlayer || gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_DISCARD) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "It is not the current player's turn");
+        }
+
+        PlayerViewDto playerViewDto = getPlayerViewDtoByHandAndGamePlayer(hand, gamePlayer);
+
+        return aiService.generateDiscardAdvice(playerViewDto);
+    }
+
+    @Transactional
+    @Override
+    public PlayerViewDto pongTile(Long gameId) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for call state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        if (gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, gamePlayer.getStatus(), "GamePlayer is not in thinking for call state");
+        }
+
+        tileService.pongTile(gamePlayer.getPlayerTile(), hand.getActiveGamePlayer().getPlayerTile(), operationService.createOperation(hand, gamePlayer));
+
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
+
+        hand.setActiveGamePlayer(savedGamePlayer);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
+
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
+    @Transactional
+    @Override
+    public PlayerViewDto chowTile(Long gameId, int combinationIndex) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+
+        if (hand.getStatus() != HandStatus.WAITING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in waiting for call state");
+        }
+
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        if (gamePlayer.getStatus() != GamePlayerStatus.THINKING_FOR_CALL) {
+            throw new ProcessException(HttpStatus.BAD_REQUEST, gamePlayer.getStatus(), "GamePlayer is not in thinking for call state");
+        }
+
+        tileService.chowTile(gamePlayer.getPlayerTile(), hand.getActiveGamePlayer().getPlayerTile(), operationService.createOperation(hand, gamePlayer), combinationIndex);
+
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
+
+        hand.setActiveGamePlayer(savedGamePlayer);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
+
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
+    private GamePlayer getGamePlayerByHandAndCurrentUserId(Hand hand) {
+        return gamePlayerService.getGamePlayerEntityByGameAndUserId(hand.getGame(), userService.getCurrentUserId());
+    }
+
+    private PlayerViewDto getPlayerViewDtoByHandAndGamePlayer(Hand hand, GamePlayer gamePlayer) {
+        return boardMapper.mapToPlayerViewDto(hand, gamePlayer);
     }
 
     private GamePlayer getGamePlayerByGameAndGamePlayerId(Game game, Long gamePlayerId) {
@@ -315,5 +433,10 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, game.getCurrentHand().getStatus(), "GamePlayer does not belong to the game");
         }
         return gamePlayer;
+    }
+
+    private Hand setHandStatus(Hand hand, HandStatus handStatus) {
+        hand.setStatus(handStatus);
+        return handRepository.save(hand);
     }
 }

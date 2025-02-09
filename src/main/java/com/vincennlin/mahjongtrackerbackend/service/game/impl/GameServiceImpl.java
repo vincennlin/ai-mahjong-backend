@@ -2,7 +2,6 @@ package com.vincennlin.mahjongtrackerbackend.service.game.impl;
 
 import com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants;
 import com.vincennlin.mahjongtrackerbackend.exception.ProcessException;
-import com.vincennlin.mahjongtrackerbackend.payload.game.playertype.PlayerType;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
 import com.vincennlin.mahjongtrackerbackend.entity.game.Game;
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
@@ -12,7 +11,7 @@ import com.vincennlin.mahjongtrackerbackend.exception.ResourceOwnershipException
 import com.vincennlin.mahjongtrackerbackend.exception.WebAPIException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.GameMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.page.GamePageResponse;
-import com.vincennlin.mahjongtrackerbackend.payload.game.request.CreateGameRequest;
+import com.vincennlin.mahjongtrackerbackend.payload.game.request.game.CreateGameRequest;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.repository.game.GameRepository;
 import com.vincennlin.mahjongtrackerbackend.service.game.GamePlayerService;
@@ -61,7 +60,9 @@ public class GameServiceImpl implements GameService {
         Game game = gameRepository.findById(gameId).orElseThrow(
                 () -> new ResourceNotFoundException("Game", "id", gameId));
 
-        authorizeOwnershipByGameCreatorId(game.getCreator().getId());
+        if (!game.containsUserById(authService.getCurrentUserId())) {
+            throw new ResourceOwnershipException(authService.getCurrentUserId());
+        }
 
         return game;
     }

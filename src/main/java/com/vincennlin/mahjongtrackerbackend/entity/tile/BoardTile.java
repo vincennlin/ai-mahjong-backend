@@ -2,6 +2,7 @@ package com.vincennlin.mahjongtrackerbackend.entity.tile;
 
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.TileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.impl.Tile;
+import com.vincennlin.mahjongtrackerbackend.payload.tile.type.SubTileType;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.type.TileType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,5 +44,13 @@ public class BoardTile {
 
     public boolean isSuit() {
         return tile.isSuit();
+    }
+
+    public boolean isSubTileTypeFlower() {
+        return tile.getSubTileType() == SubTileType.FLOWER;
+    }
+
+    public boolean isSubTileTypeSeason() {
+        return tile.getSubTileType() == SubTileType.SEASON;
     }
 }
