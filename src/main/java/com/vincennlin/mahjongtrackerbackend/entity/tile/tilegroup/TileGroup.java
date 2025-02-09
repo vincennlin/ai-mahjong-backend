@@ -62,6 +62,9 @@ public abstract class TileGroup {
         tiles.remove(boardTile);
         if (tileCountMap != null) {
             tileCountMap.put(boardTile.getTile(), tileCountMap.getOrDefault(boardTile.getTile(), 0) - 1);
+            if (tileCountMap.get(boardTile.getTile()) == 0) {
+                tileCountMap.remove(boardTile.getTile());
+            }
         }
         return boardTile;
     }
@@ -74,6 +77,9 @@ public abstract class TileGroup {
         boardTile.setTileGroup(null);
         if (tileCountMap != null) {
             tileCountMap.put(boardTile.getTile(), tileCountMap.getOrDefault(boardTile.getTile(), 0) - 1);
+            if (tileCountMap.get(boardTile.getTile()) == 0) {
+                tileCountMap.remove(boardTile.getTile());
+            }
         }
         return boardTile;
     }
@@ -88,6 +94,9 @@ public abstract class TileGroup {
             boardTileToRemove.setTileGroup(null);
             if (tileCountMap != null) {
                 tileCountMap.put(boardTileToRemove.getTile(), tileCountMap.getOrDefault(boardTileToRemove.getTile(), 0) - 1);
+                if (tileCountMap.get(boardTileToRemove.getTile()) == 0) {
+                    tileCountMap.remove(boardTileToRemove.getTile());
+                }
             }
             return boardTileToRemove;
         } else {
