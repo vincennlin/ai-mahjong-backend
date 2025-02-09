@@ -86,12 +86,12 @@ public class PlayerTile {
 
     public void pongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {
         BoardTile tile1 = handTiles.removeFirstBoardTileByTile(boardTile.getTile());
-        exposedTiles.addBoardTileToTileGroup(tile1);
+        exposedTiles.addBoardTileToTileGroup(tile1, 'l');
 
-        exposedTiles.addBoardTileToTileGroup(boardTile);
+        exposedTiles.addBoardTileToTileGroup(boardTile, 'm');
 
         BoardTile tile2 = handTiles.removeFirstBoardTileByTile(boardTile.getTile());
-        exposedTiles.addBoardTileToTileGroup(tile2);
+        exposedTiles.addBoardTileToTileGroup(tile2, 'r');
 
         getExposedTiles().add(exposedTiles);
     }
@@ -100,12 +100,12 @@ public class PlayerTile {
         chowCombination.remove(1);
 
         BoardTile tile1 = handTiles.removeFirstBoardTileByTile(chowCombination.remove(0));
-        exposedTiles.addBoardTileToTileGroup(tile1);
+        exposedTiles.addBoardTileToTileGroup(tile1, 'l');
 
-        exposedTiles.addBoardTileToTileGroup(boardTile);
+        exposedTiles.addBoardTileToTileGroup(boardTile, 'm');
 
         BoardTile tile2 = handTiles.removeFirstBoardTileByTile(chowCombination.remove(0));
-        exposedTiles.addBoardTileToTileGroup(tile2);
+        exposedTiles.addBoardTileToTileGroup(tile2, 'r');
 
         getExposedTiles().add(exposedTiles);
     }

@@ -54,11 +54,13 @@ public class TileGroupMapper {
         exposedTileGroupDto.setTilesSub(tilesString[1]);
         exposedTileGroupDto.setTileCount(exposedTileGroup.getTiles().size());
 
-        exposedTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(exposedTileGroup.getTiles()));
+        exposedTileGroupDto.setTiles(boardTileMapper.mapExposedBoardTilesToDto(exposedTileGroup));
 
         exposedTileGroupDto.setPlayerId(exposedTileGroup.getPlayerId());
 
         exposedTileGroupDto.setMeldType(exposedTileGroup.getMeldType());
+
+        exposedTileGroupDto.setTopBoardTile(boardTileMapper.mapToDto(exposedTileGroup.getTopBoardTile()));
 
         return exposedTileGroupDto;
     }

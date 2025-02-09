@@ -15,4 +15,7 @@ public class ExposedTileGroupDto extends PlayerTileGroupDto {
 
     @JsonProperty(value = "meld_type")
     private MeldType meldType;
+
+    @JsonProperty(value = "top_board_tile")
+    private BoardTileDto topBoardTile;
 }
