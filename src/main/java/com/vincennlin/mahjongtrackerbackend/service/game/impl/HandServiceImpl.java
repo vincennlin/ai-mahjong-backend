@@ -10,10 +10,8 @@ import com.vincennlin.mahjongtrackerbackend.exception.ResourceNotFoundException;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.BoardMapper;
 import com.vincennlin.mahjongtrackerbackend.mapper.game.HandMapper;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.BoardDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.dto.GameDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.HandDto;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.PlayerViewDto;
-import com.vincennlin.mahjongtrackerbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.mahjongtrackerbackend.payload.game.request.ai.DiscardAdviceResponse;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GameStatus;
@@ -27,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
@@ -218,15 +217,24 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in finished breaking wall state");
         }
 
+        int[] foulHandCount = new int[DefaultGameConstants.DEFAULT_PLAYER_COUNT];
+        // 如果開門補到花，則 isFoulHand() 為 true，所以多補一張
+        foulHandCount[0] = hand.getDealer().getPlayerTile().getDrawnTiles().isFoulHand() ? 1 : 0;
+
         GamePlayer currentPlayer = hand.getDealer();
 
-        while (hand.getPlayerTiles().stream().anyMatch(
-                playerTile -> playerTile.getHandTiles().containsFlowerTile())) {
+        for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
+            PlayerTile playerTile = currentPlayer.getPlayerTile();
+            foulHandCount[i] += playerTile.getHandTiles().getInitialFoulHandCount();
+            currentPlayer = currentPlayer.getDownwindPlayer();
+        }
+
+        while (Arrays.stream(foulHandCount).sum() > 0) {
             for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
-                PlayerTile playerTile = currentPlayer.getPlayerTile();
-                if (playerTile.getHandTiles().containsFlowerTile()) {
-                    playerTile.getHandTiles().sortHandTiles();
-                    tileService.initialFoulHand(playerTile, hand.getWallTileGroup());
+                if (foulHandCount[i] >= 1) {
+                    PlayerTile playerTile = currentPlayer.getPlayerTile();
+                    tileService.initialFoulHand(playerTile, hand.getWallTileGroup(), foulHandCount[i], currentPlayer == hand.getDealer());
+                    foulHandCount[i] = playerTile.getHandTiles().getInitialFoulHandCount();
                 }
                 currentPlayer = currentPlayer.getDownwindPlayer();
             }

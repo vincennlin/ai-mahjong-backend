@@ -50,10 +50,12 @@ public abstract class TileGroup {
     }
 
     public void addBoardTileToTileGroup(BoardTile boardTile) {
-        boardTile.setTileGroup(this);
-        tiles.add(boardTile);
-        if (tileCountMap != null) {
-            tileCountMap.put(boardTile.getTile(), tileCountMap.getOrDefault(boardTile.getTile(), 0) + 1);
+        if (boardTile != null) {
+            boardTile.setTileGroup(this);
+            tiles.add(boardTile);
+            if (tileCountMap != null) {
+                tileCountMap.put(boardTile.getTile(), tileCountMap.getOrDefault(boardTile.getTile(), 0) + 1);
+            }
         }
     }
 

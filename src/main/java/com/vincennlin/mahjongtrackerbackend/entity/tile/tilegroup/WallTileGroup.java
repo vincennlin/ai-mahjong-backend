@@ -25,10 +25,10 @@ public class WallTileGroup extends TileGroup {
     )
     private Hand hand;
 
-    public BoardTile drawTileFromWall(boolean isFromHead) {
+    public BoardTile drawTileFromWall(boolean isFoulHand) {
         if (getTiles().isEmpty()) {
             return null;
         }
-        return getTiles().remove(isFromHead ? 0 : getTiles().size() - 1);
+        return getTiles().remove(isFoulHand ? getTiles().size() - 1 : 0);
     }
 }

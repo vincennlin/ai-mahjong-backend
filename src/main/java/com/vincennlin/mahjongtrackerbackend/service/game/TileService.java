@@ -26,13 +26,15 @@ public interface TileService {
 
     void reorderWallTiles(int diceNumber, WallTileGroup wallTileGroup);
 
-    void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
+    void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup, int foulHandCount, boolean isDealer);
 
     BoardTile drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup);
 
     BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup);
 
     BoardTile discardTile(PlayerTile playerTile, Long boardTileId, Operation operation);
+
+    BoardTile setLastDrawnTile(PlayerTile playerTile, BoardTile boardTile);
 
     void pongTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation);
 

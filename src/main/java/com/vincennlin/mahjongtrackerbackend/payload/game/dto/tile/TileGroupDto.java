@@ -22,6 +22,14 @@ public abstract class TileGroupDto {
     private int tileCount;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(value = "last_drawn_tile_num")
+    private Character lastDrawnTileNum;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(value = "last_drawn_tile_sub")
+    private Character lastDrawnTileSub;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "tiles_num")
     private String tilesNum;
 
@@ -37,5 +45,9 @@ public abstract class TileGroupDto {
         setTiles(null);
         setTilesNum("*".repeat(tileCount));
         setTilesSub("*".repeat(tileCount));
+        if (lastDrawnTileNum != null) {
+            setLastDrawnTileNum('*');
+            setLastDrawnTileSub('*');
+        }
     }
 }

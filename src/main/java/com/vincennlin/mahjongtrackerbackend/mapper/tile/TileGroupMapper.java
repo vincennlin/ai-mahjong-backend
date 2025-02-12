@@ -3,6 +3,7 @@ package com.vincennlin.mahjongtrackerbackend.mapper.tile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.ExposedTileGroup;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.HandTileGroup;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.PlayerTileGroup;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup.WallTileGroup;
 import com.vincennlin.mahjongtrackerbackend.payload.game.dto.tile.*;
@@ -72,7 +73,14 @@ public class TileGroupMapper {
         playerTileGroupDto.setTilesSub(tilesString[1]);
         playerTileGroupDto.setTileCount(playerTileGroup.getTiles().size());
 
-//        playerTileGroupDto.setTiles(null);
+        // 如果是剛摸完牌的手牌，多顯示剛摸到的手牌，並把牌總數 +1
+        if (playerTileGroup instanceof HandTileGroup && (playerTileGroup.getPlayerTile().getDrawnTiles().hasDrawnTile())) {
+            BoardTile lastDrawnTile = (playerTileGroup.getPlayerTile().getDrawnTiles().getDrawnTile());
+            playerTileGroupDto.setLastDrawnTileNum(lastDrawnTile.getTile().getName().charAt(0));
+            playerTileGroupDto.setLastDrawnTileSub(lastDrawnTile.getTile().getName().charAt(1));
+            playerTileGroupDto.setTileCount(playerTileGroup.getTiles().size() + 1);
+        }
+
         playerTileGroupDto.setTiles(boardTileMapper.mapBoardTilesToDto(playerTileGroup.getTiles()));
 
         playerTileGroupDto.setPlayerId(playerTileGroup.getPlayerId());

@@ -35,6 +35,7 @@ public class TileServiceImpl implements TileService {
     private final FlowerTileGroupRepository flowerTileGroupRepository;
     private final ExposedTileGroupRepository exposedTileGroupRepository;
     private final DiscardedTileGroupRepository discardedTileGroupRepository;
+    private final DrawnTileGroupRepository drawnTileGroupRepository;
     private final PlayerTileRepository playerTileRepository;
     private final OperationService operationService;
 
@@ -62,6 +63,9 @@ public class TileServiceImpl implements TileService {
 
             DiscardedTileGroup discardedTileGroup = new DiscardedTileGroup(playerTile);
             playerTile.setDiscardedTiles(discardedTileGroupRepository.save(discardedTileGroup));
+
+            DrawnTileGroup drawnTileGroup = new DrawnTileGroup(playerTile);
+            playerTile.setDrawnTiles(drawnTileGroupRepository.save(drawnTileGroup));
         }
 
         return playerTileRepository.saveAll(playerTileList);
@@ -152,9 +156,14 @@ public class TileServiceImpl implements TileService {
         for (int round = 0; round < 4; round++) {
             for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
                 HandTileGroup handTileGroup = playerTileList.get(i).getHandTiles();
+                FlowerTileGroup flowerTileGroup = playerTileList.get(i).getFlowerTiles();
                 for (int j = 0; j < 4; j++) {
                     BoardTile boardTile = wallTiles.remove(0);
-                    handTileGroup.addBoardTileToTileGroup(boardTile);
+                    if (boardTile.isFlower()) {
+                        flowerTileGroup.addBoardTileToTileGroup(boardTile);
+                    } else {
+                        handTileGroup.addBoardTileToTileGroup(boardTile);
+                    }
                 }
                 currentPlayer = currentPlayer.getDownwindPlayer();
             }
@@ -189,24 +198,26 @@ public class TileServiceImpl implements TileService {
     }
 
     @Override
-    public void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
+    public void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup, int foulHandCount, boolean isDealer) {
 
         HandTileGroup handTileGroup = playerTile.getHandTiles();
-        FlowerTileGroup flowerTileGroup = playerTile.getFlowerTiles();
 
-        List<BoardTile> handTiles = handTileGroup.getTiles();
+        boolean containsFlower = false;
 
-        while (handTiles.get(handTiles.size() - 1).getTile().isFlower()) {
-            flowerTileGroup.addBoardTileToTileGroup(handTileGroup.removeLastBoardTile());
+        for (int i = 0; i < foulHandCount; i++) {
+            BoardTile boardTile = wallTileGroup.drawTileFromWall(true);
 
-            BoardTile boardTile = wallTileGroup.drawTileFromWall(false);
-            handTiles.add(boardTile);
-            boardTile.setTileGroup(handTileGroup);
+            if (boardTile.isFlower()) {
+                containsFlower = true;
+            }
 
-            boardTileRepository.save(boardTile);
+            if (isDealer && i == foulHandCount - 1 && !containsFlower) { // 莊家沒有後花要補
+                setLastDrawnTile(playerTile, boardTile); // 將最後一張補到的設為 lastDrawnTile
+            } else {
+                handTileGroup.addBoardTileToTileGroup(boardTile);
+                boardTileRepository.save(boardTile);
+            }
         }
-
-        playerTile.getHandTiles().sortHandTiles();
 
         playerTileRepository.save(playerTile);
     }
@@ -215,20 +226,20 @@ public class TileServiceImpl implements TileService {
     @Override
     public BoardTile drawTile(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
-        return drawTileFromWall(playerTile, wallTileGroup, true);
+        return drawTileFromWall(playerTile, wallTileGroup, false);
     }
 
     @Transactional
     @Override
     public BoardTile foulHand(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
-        return drawTileFromWall(playerTile, wallTileGroup, false);
+        return drawTileFromWall(playerTile, wallTileGroup, true);
     }
 
-    private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFromHead) {
+    private BoardTile drawTileFromWall(PlayerTile playerTile, WallTileGroup wallTileGroup, boolean isFoulHand) {
 
-        BoardTile boardTile = wallTileGroup.drawTileFromWall(isFromHead);
-        playerTile.addBoardTileToTileGroup(boardTile);
+        BoardTile boardTile = wallTileGroup.drawTileFromWall(isFoulHand);
+        playerTile.setLastDrawnTileToPlayerTileGroup(boardTile);
 
         return boardTileRepository.save(boardTile);
     }
@@ -248,12 +259,27 @@ public class TileServiceImpl implements TileService {
         operation.setPreviousTileGroup(boardTile.getTileGroup());
         operation.setBoardTile(boardTile);
 
-        playerTile.getDiscardedTiles().addBoardTileToTileGroup(boardTile);
-        BoardTile savedBoardTile = boardTileRepository.save(boardTile);
-
         operationService.saveOperation(operation);
 
-        return savedBoardTile;
+        // 捨牌後才將剛剛摸到的牌加入手牌
+        DrawnTileGroup drawnTileGroup = playerTile.getDrawnTiles();
+        BoardTile lastDrawnTile = playerTile.getDrawnTiles().getDrawnTile();
+        drawnTileGroup.clearDrawnTile();
+        playerTile.getHandTiles().addBoardTileToTileGroup(lastDrawnTile);
+        boardTileRepository.save(lastDrawnTile);
+
+        playerTile.getDiscardedTiles().addBoardTileToTileGroup(boardTile);
+
+        return boardTileRepository.save(boardTile);
+    }
+
+    @Override
+    public BoardTile setLastDrawnTile(PlayerTile playerTile, BoardTile boardTile) {
+
+        DrawnTileGroup drawnTileGroup = playerTile.getDrawnTiles();
+        drawnTileGroup.setDrawnTile(boardTile, false);
+
+        return boardTileRepository.save(boardTile);
     }
 
     @Transactional

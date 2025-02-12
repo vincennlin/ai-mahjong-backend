@@ -1,6 +1,7 @@
 package com.vincennlin.mahjongtrackerbackend.entity.tile.tilegroup;
 
 import com.vincennlin.mahjongtrackerbackend.entity.game.GamePlayer;
+import com.vincennlin.mahjongtrackerbackend.entity.tile.BoardTile;
 import com.vincennlin.mahjongtrackerbackend.entity.tile.PlayerTile;
 import com.vincennlin.mahjongtrackerbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.mahjongtrackerbackend.payload.tile.TileComparator;
@@ -12,6 +13,9 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.vincennlin.mahjongtrackerbackend.constant.game.DefaultGameConstants.DEFAULT_TILE_COUNT_PER_PLAYER;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -32,6 +36,10 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
 
+    public int getInitialFoulHandCount() {
+        return DEFAULT_TILE_COUNT_PER_PLAYER - getTiles().size();
+    }
+
     public int getCountForTile(Tile tile) {
         return getTileCountMap().getOrDefault(tile, 0);
     }
@@ -43,10 +51,6 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     private boolean hasTile(Tile tile) {
         if (tile == null) return false;
         return getCountForTile(tile) > 0;
-    }
-
-    public boolean containsFlowerTile() {
-        return getTileCountMap().entrySet().stream().anyMatch(entry -> entry.getKey().isFlower() && entry.getValue() > 0);
     }
 
     public boolean canCall(GamePlayer discardGamePlayer, Tile tile) {

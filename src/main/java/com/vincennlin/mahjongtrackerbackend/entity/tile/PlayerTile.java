@@ -68,15 +68,23 @@ public class PlayerTile {
     )
     private DiscardedTileGroup discardedTiles;
 
+    @OneToOne(
+            mappedBy = "playerTile",
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
+    )
+    private DrawnTileGroup drawnTiles;
+
     public String[] convertTilesToString(TileGroup tileGroup) {
         return tileGroup.convertTilesToString();
     }
 
-    public void addBoardTileToTileGroup(BoardTile boardTile) {
+    public void setLastDrawnTileToPlayerTileGroup(BoardTile boardTile) {
         if (boardTile.isFlower()) {
             flowerTiles.addBoardTileToTileGroup(boardTile);
+            drawnTiles.setDrawnTile(null, true);
         } else {
-            handTiles.addBoardTileToTileGroup(boardTile);
+            drawnTiles.setDrawnTile(boardTile, false);
         }
     }
 
