@@ -39,13 +39,15 @@ public interface HandService {
 
     PlayerViewDto discardTile(Long gameId, Long boardTileId);
 
+    DiscardAdviceResponse generateDiscardAdvice(Long gameId);
+
     PlayerViewDto cancelForCall(Long gameId);
 
     PlayerViewDto drawTile(Long gameId);
 
-    DiscardAdviceResponse generateDiscardAdvice(Long gameId);
-
     PlayerViewDto pongTile(Long gameId);
 
     PlayerViewDto chowTile(Long gameId, int combinationIndex);
+
+    PlayerViewDto exposeKongTile(Long gameId);
 }

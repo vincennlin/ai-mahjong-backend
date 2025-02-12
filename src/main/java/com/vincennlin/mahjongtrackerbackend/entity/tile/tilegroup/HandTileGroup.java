@@ -54,7 +54,7 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         if (currentPlayer == discardGamePlayer) {
             return false;
         }
-        if (canCallChow(discardGamePlayer, tile) || canCallPong(discardGamePlayer, tile) || canCallKong(discardGamePlayer, tile)) {
+        if (canCallChow(discardGamePlayer, tile) || canCallPong(discardGamePlayer, tile) || canCallExposedKong(discardGamePlayer, tile)) {
             getGamePlayer().setStatus(GamePlayerStatus.THINKING_FOR_CALL);
             return true;
         }
@@ -81,9 +81,9 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         return getCountForTile(tile) >= 2;
     }
 
-    public boolean canCallKong(GamePlayer discardGamePlayer, Tile tile) {
+    public boolean canCallExposedKong(GamePlayer discardGamePlayer, Tile tile) {
         GamePlayer currentPlayer = getPlayerTile().getGamePlayer();
-        if (currentPlayer == discardGamePlayer) {
+        if (currentPlayer == discardGamePlayer || discardGamePlayer == currentPlayer.getUpwindPlayer()) {
             return false;
         }
         return getCountForTile(tile) == 3;

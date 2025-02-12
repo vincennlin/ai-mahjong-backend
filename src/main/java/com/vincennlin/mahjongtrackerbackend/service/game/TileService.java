@@ -37,4 +37,6 @@ public interface TileService {
     void pongTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation);
 
     void chowTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation, int combinationIndex);
+
+    void exposeKongTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation);
 }

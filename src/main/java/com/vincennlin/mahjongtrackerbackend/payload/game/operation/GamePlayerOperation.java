@@ -23,7 +23,7 @@ public enum GamePlayerOperation implements GamePlayerOperationInterface {
     CALL_FOR_EXPOSED_KONG(GamePlayerStatus.THINKING_FOR_DISCARD) {
         @Override
         public boolean canOperate(Hand hand, GamePlayer gamePlayer) {
-            return gamePlayer.getHandTiles().canCallKong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile());
+            return gamePlayer.getHandTiles().canCallExposedKong(hand.getActiveGamePlayer(), hand.getLastDiscardedTile().getTile());
         }
     },
     CANCEL(GamePlayerStatus.WAITING) {

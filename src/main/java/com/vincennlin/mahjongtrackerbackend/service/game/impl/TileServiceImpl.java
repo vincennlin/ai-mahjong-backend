@@ -260,11 +260,7 @@ public class TileServiceImpl implements TileService {
     @Override
     public void pongTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation) {
 
-        BoardTile boardTile = discardedPlayerTile.getDiscardedTiles().removeLastBoardTile();
-
-        if (boardTile == null) {
-            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Discarded tile is not found");
-        }
+        BoardTile boardTile = getLastDiscardedTile(discardedPlayerTile);
 
         if (!playerTile.getHandTiles().canCallPong(discardedPlayerTile.getGamePlayer(), boardTile.getTile())) {
             throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player cannot call pong");
@@ -284,11 +280,7 @@ public class TileServiceImpl implements TileService {
     @Override
     public void chowTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation, int combinationIndex) {
 
-        BoardTile boardTile = discardedPlayerTile.getDiscardedTiles().removeLastBoardTile();
-
-        if (boardTile == null) {
-            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Discarded tile is not found");
-        }
+        BoardTile boardTile = getLastDiscardedTile(discardedPlayerTile);
 
         if (!playerTile.getHandTiles().canCallChow(discardedPlayerTile.getGamePlayer(), boardTile.getTile())) {
             throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player cannot call chow");
@@ -324,6 +316,26 @@ public class TileServiceImpl implements TileService {
         saveExposedTileGroup(exposedTileGroup);
     }
 
+    @Transactional
+    @Override
+    public void exposeKongTile(PlayerTile playerTile, PlayerTile discardedPlayerTile, Operation operation) {
+
+        BoardTile boardTile = getLastDiscardedTile(discardedPlayerTile);
+
+        if (!playerTile.getHandTiles().canCallExposedKong(discardedPlayerTile.getGamePlayer(), boardTile.getTile())) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player cannot call exposed kong");
+        }
+
+        operation.setGamePlayerOperation(GamePlayerOperation.CALL_FOR_EXPOSED_KONG);
+        operation.setBoardTile(boardTile);
+        operation.setPreviousTileGroup(boardTile.getTileGroup());
+
+        ExposedTileGroup exposedTileGroup = createExposedTileGroup(playerTile, MeldType.EXPOSED_KONG);
+        playerTile.exposePongTile(exposedTileGroup, boardTile);
+
+        saveExposedTileGroup(exposedTileGroup);
+    }
+
     private ExposedTileGroup createExposedTileGroup(PlayerTile playerTile, MeldType meldType) {
         ExposedTileGroup exposedTileGroup = new ExposedTileGroup(playerTile, meldType);
         return exposedTileGroupRepository.save(exposedTileGroup);
@@ -331,5 +343,13 @@ public class TileServiceImpl implements TileService {
 
     private void saveExposedTileGroup(ExposedTileGroup exposedTileGroup) {
         exposedTileGroupRepository.save(exposedTileGroup);
+    }
+
+    private BoardTile getLastDiscardedTile(PlayerTile discardedPlayerTile) {
+        BoardTile boardTile = discardedPlayerTile.getDiscardedTiles().removeLastBoardTile();
+        if (boardTile == null) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Discarded tile is not found");
+        }
+        return boardTile;
     }
 }

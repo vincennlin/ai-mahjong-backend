@@ -85,13 +85,11 @@ public class PlayerTile {
     }
 
     public void pongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {
-        BoardTile tile1 = handTiles.removeFirstBoardTileByTile(boardTile.getTile());
-        exposedTiles.addBoardTileToTileGroup(tile1, 'l');
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'l');
 
         exposedTiles.addBoardTileToTileGroup(boardTile, 'm');
 
-        BoardTile tile2 = handTiles.removeFirstBoardTileByTile(boardTile.getTile());
-        exposedTiles.addBoardTileToTileGroup(tile2, 'r');
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'r');
 
         getExposedTiles().add(exposedTiles);
     }
@@ -99,13 +97,23 @@ public class PlayerTile {
     public void chowTile(ExposedTileGroup exposedTiles, BoardTile boardTile, List<Tile> chowCombination) {
         chowCombination.remove(1);
 
-        BoardTile tile1 = handTiles.removeFirstBoardTileByTile(chowCombination.remove(0));
-        exposedTiles.addBoardTileToTileGroup(tile1, 'l');
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(chowCombination.remove(0)), 'l');
 
         exposedTiles.addBoardTileToTileGroup(boardTile, 'm');
 
-        BoardTile tile2 = handTiles.removeFirstBoardTileByTile(chowCombination.remove(0));
-        exposedTiles.addBoardTileToTileGroup(tile2, 'r');
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(chowCombination.remove(0)), 'r');
+
+        getExposedTiles().add(exposedTiles);
+    }
+
+    public void exposePongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'l');
+
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'm');
+
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'r');
+
+        exposedTiles.addBoardTileToTileGroup(boardTile, 't');
 
         getExposedTiles().add(exposedTiles);
     }
