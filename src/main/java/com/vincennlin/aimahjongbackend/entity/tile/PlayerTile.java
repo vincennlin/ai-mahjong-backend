@@ -114,7 +114,19 @@ public class PlayerTile {
         getExposedTiles().add(exposedTiles);
     }
 
-    public void exposePongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {
+    public void exposeKongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'l');
+
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'm');
+
+        exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'r');
+
+        exposedTiles.addBoardTileToTileGroup(boardTile, 't');
+
+        getExposedTiles().add(exposedTiles);
+    }
+
+    public void concealKongTile(ExposedTileGroup exposedTiles, BoardTile boardTile) {
         exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'l');
 
         exposedTiles.addBoardTileToTileGroup(handTiles.removeFirstBoardTileByTile(boardTile.getTile()), 'm');

@@ -430,6 +430,31 @@ public class HandServiceImpl implements HandService {
         return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
     }
 
+    @Transactional
+    @Override
+    public PlayerViewDto concealKongTile(Long gameId, int combinationIndex) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        checkIsThinkingForDiscard(hand, gamePlayer);
+
+        tileService.concealKongTile(gamePlayer.getPlayerTile(), operationService.createOperation(hand, gamePlayer), combinationIndex);
+
+        BoardTile drawnTile = tileService.foulHand(gamePlayer.getPlayerTile(), hand.getWallTileGroup());
+
+        while (drawnTile.isFlower()) {
+            drawnTile = tileService.foulHand(gamePlayer.getPlayerTile(), hand.getWallTileGroup());
+        }
+
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
+
+        hand.setActiveGamePlayer(savedGamePlayer);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
+
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
     private GamePlayer getGamePlayerByHandAndCurrentUserId(Hand hand) {
         return gamePlayerService.getGamePlayerEntityByGameAndUserId(hand.getGame(), userService.getCurrentUserId());
     }

@@ -49,7 +49,7 @@ public enum GamePlayerOperation implements GamePlayerOperationInterface {
     CALL_FOR_CONCEALED_KONG(GamePlayerStatus.THINKING_FOR_DISCARD) {
         @Override
         public boolean canOperate(Hand hand, GamePlayer gamePlayer) {
-            return gamePlayer.getHandTiles().canCallConcealedKong();
+            return gamePlayer.getHandTiles().canCallConcealedKong(gamePlayer.getPlayerTile().getDrawnTiles().getDrawnTile().getTile());
         }
     },
     CALL_FOR_ADDED_KONG(GamePlayerStatus.THINKING_FOR_DISCARD) {

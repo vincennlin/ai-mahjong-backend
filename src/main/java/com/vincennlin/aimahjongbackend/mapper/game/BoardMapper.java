@@ -80,6 +80,7 @@ public class BoardMapper {
         playerViewDto.setGamePlayerStatus(gamePlayer.getStatus());
 
         playerViewDto.setAcceptableOperations(gamePlayer.getStatus().getAcceptableOperations(hand, gamePlayer));
+
         if (playerViewDto.getAcceptableOperations().contains(GamePlayerOperation.CALL_FOR_CHOW)) {
             List<List<Tile>> chowCombinations = gamePlayer.getPlayerTile().getHandTiles().getChowCombinations(hand.getLastDiscardedTile().getTile());
             List<List<TileDto>> chowCombinationsDto = new ArrayList<>();
@@ -87,6 +88,11 @@ public class BoardMapper {
                 chowCombinationsDto.add(tileMapper.mapTilesToDtoList(chowCombination));
             }
             playerViewDto.setChowCombinations(chowCombinationsDto);
+        }
+
+        if (playerViewDto.getAcceptableOperations().contains(GamePlayerOperation.CALL_FOR_CONCEALED_KONG)) {
+            List<Tile> concealedKongCombinations = gamePlayer.getPlayerTile().getHandTiles().getConcealedKongCombinations(gamePlayer.getPlayerTile().getDrawnTiles().getDrawnTile().getTile());
+            playerViewDto.setConcealedKongCombinations(tileMapper.mapTilesToDtoList(concealedKongCombinations));
         }
 
         playerViewDto.setRoundWind(hand.getRound().getRoundWind());
