@@ -198,28 +198,52 @@ public class TileServiceImpl implements TileService {
     }
 
     @Override
-    public void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup, int foulHandCount, boolean isDealer) {
+    public void breakWall(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
-        HandTileGroup handTileGroup = playerTile.getHandTiles();
+        BoardTile breakWallTile = wallTileGroup.drawTileFromWall(false);
 
-        boolean containsFlower = false;
+        if (playerTile.getHandTiles().getTiles().size() == DefaultGameConstants.DEFAULT_TILE_COUNT_PER_PLAYER
+                && !breakWallTile.isFlower()) { // 不需要補花，直接將摸到的牌設為 LastDrawnTile
+            playerTile.setLastDrawnTileToPlayerTileGroup(breakWallTile);
+        } else { // 需要補花
+            if (breakWallTile.isFlower()) {
+                playerTile.setLastDrawnTileToPlayerTileGroup(breakWallTile);
+            } else {
+                playerTile.getHandTiles().addBoardTileToTileGroup(breakWallTile);
+            }
+        }
+
+        boardTileRepository.save(breakWallTile);
+    }
+
+    @Override
+    public int initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup, int foulHandCount, boolean isDealer) {
+
+        int flowerCount = 0;
 
         for (int i = 0; i < foulHandCount; i++) {
             BoardTile boardTile = wallTileGroup.drawTileFromWall(true);
 
             if (boardTile.isFlower()) {
-                containsFlower = true;
+                flowerCount++;
             }
 
-            if (isDealer && i == foulHandCount - 1 && !containsFlower) { // 莊家沒有後花要補
-                setLastDrawnTile(playerTile, boardTile); // 將最後一張補到的設為 lastDrawnTile
+            if (isDealer && i == foulHandCount - 1 && flowerCount == 0) { // 莊家沒有後花要補
+                playerTile.setLastDrawnTileToPlayerTileGroup(boardTile); // 將最後一張補到的設為 lastDrawnTile
             } else {
-                handTileGroup.addBoardTileToTileGroup(boardTile);
-                boardTileRepository.save(boardTile);
+                if (boardTile.isFlower()) {
+                    playerTile.getFlowerTiles().addBoardTileToTileGroup(boardTile);
+                } else {
+                    playerTile.getHandTiles().addBoardTileToTileGroup(boardTile);
+                }
             }
+
+            boardTileRepository.save(boardTile);
         }
 
         playerTileRepository.save(playerTile);
+
+        return flowerCount;
     }
 
     @Transactional

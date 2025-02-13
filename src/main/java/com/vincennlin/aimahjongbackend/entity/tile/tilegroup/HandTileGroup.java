@@ -1,6 +1,7 @@
 package com.vincennlin.aimahjongbackend.entity.tile.tilegroup;
 
 import com.vincennlin.aimahjongbackend.entity.game.GamePlayer;
+import com.vincennlin.aimahjongbackend.entity.tile.BoardTile;
 import com.vincennlin.aimahjongbackend.entity.tile.PlayerTile;
 import com.vincennlin.aimahjongbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.aimahjongbackend.payload.tile.TileComparator;
@@ -34,10 +35,6 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
     )
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
-
-    public int getInitialFoulHandCount() {
-        return DEFAULT_TILE_COUNT_PER_PLAYER - getTiles().size();
-    }
 
     public int getCountForTile(Tile tile) {
         return getTileCountMap().getOrDefault(tile, 0);
@@ -92,8 +89,9 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         return getCountForTile(tile) == 3;
     }
 
-    public boolean canCallConcealedKong() {
-        return getTiles().stream().anyMatch(boardTile -> getCountForTile(boardTile.getTile()) == 4);
+    public boolean canCallConcealedKong(Tile lastDrawnTile) {
+        return getTiles().stream().anyMatch(boardTile -> getCountForTile(boardTile.getTile()) == 4)
+                || (lastDrawnTile != null && getCountForTile(lastDrawnTile) == 3);
     }
 
     public boolean canCallAddedKong() {
@@ -140,6 +138,19 @@ public class HandTileGroup extends TileGroup implements PlayerTileGroup {
         }
 
         return chowCombinations;
+    }
+
+    public List<Tile> getConcealedKongCombinations(Tile lastDrawnTile) {
+        List<Tile> concealedKongCombinations = new ArrayList<>();
+        getTileCountMap().keySet().forEach(tile -> {
+            if (getCountForTile(tile) == 4) {
+                concealedKongCombinations.add(tile);
+            }
+        });
+        if (lastDrawnTile != null && getCountForTile(lastDrawnTile) == 3) {
+            concealedKongCombinations.add(lastDrawnTile);
+        }
+        return concealedKongCombinations;
     }
 
     private boolean canCallInsideStraightChow(Tile tile) {
