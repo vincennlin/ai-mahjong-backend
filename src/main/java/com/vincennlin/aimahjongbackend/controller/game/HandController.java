@@ -175,4 +175,13 @@ public class HandController implements HandControllerSwagger {
 
         return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
     }
+
+    @PostMapping("/games/{game_id}/conceal-kong-tile/{combination_index}")
+    public ResponseEntity<PlayerViewDto> concealKongTile(@PathVariable(name = "game_id") Long gameId,
+                                                         @PathVariable(name = "combination_index") int combinationIndex) {
+
+        PlayerViewDto playerViewDto = handService.concealKongTile(gameId, combinationIndex);
+
+        return new ResponseEntity<>(playerViewDto, HttpStatus.OK);
+    }
 }

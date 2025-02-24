@@ -198,28 +198,52 @@ public class TileServiceImpl implements TileService {
     }
 
     @Override
-    public void initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup, int foulHandCount, boolean isDealer) {
+    public void breakWall(PlayerTile playerTile, WallTileGroup wallTileGroup) {
 
-        HandTileGroup handTileGroup = playerTile.getHandTiles();
+        BoardTile breakWallTile = wallTileGroup.drawTileFromWall(false);
 
-        boolean containsFlower = false;
+        if (playerTile.getHandTiles().getTiles().size() == DefaultGameConstants.DEFAULT_TILE_COUNT_PER_PLAYER
+                && !breakWallTile.isFlower()) { // 不需要補花，直接將摸到的牌設為 LastDrawnTile
+            playerTile.setLastDrawnTileToPlayerTileGroup(breakWallTile);
+        } else { // 需要補花
+            if (breakWallTile.isFlower()) {
+                playerTile.setLastDrawnTileToPlayerTileGroup(breakWallTile);
+            } else {
+                playerTile.getHandTiles().addBoardTileToTileGroup(breakWallTile);
+            }
+        }
+
+        boardTileRepository.save(breakWallTile);
+    }
+
+    @Override
+    public int initialFoulHand(PlayerTile playerTile, WallTileGroup wallTileGroup, int foulHandCount, boolean isDealer) {
+
+        int flowerCount = 0;
 
         for (int i = 0; i < foulHandCount; i++) {
             BoardTile boardTile = wallTileGroup.drawTileFromWall(true);
 
             if (boardTile.isFlower()) {
-                containsFlower = true;
+                flowerCount++;
             }
 
-            if (isDealer && i == foulHandCount - 1 && !containsFlower) { // 莊家沒有後花要補
-                setLastDrawnTile(playerTile, boardTile); // 將最後一張補到的設為 lastDrawnTile
+            if (isDealer && i == foulHandCount - 1 && flowerCount == 0) { // 莊家沒有後花要補
+                playerTile.setLastDrawnTileToPlayerTileGroup(boardTile); // 將最後一張補到的設為 lastDrawnTile
             } else {
-                handTileGroup.addBoardTileToTileGroup(boardTile);
-                boardTileRepository.save(boardTile);
+                if (boardTile.isFlower()) {
+                    playerTile.getFlowerTiles().addBoardTileToTileGroup(boardTile);
+                } else {
+                    playerTile.getHandTiles().addBoardTileToTileGroup(boardTile);
+                }
             }
+
+            boardTileRepository.save(boardTile);
         }
 
         playerTileRepository.save(playerTile);
+
+        return flowerCount;
     }
 
     @Transactional
@@ -258,7 +282,6 @@ public class TileServiceImpl implements TileService {
         operation.setGamePlayerOperation(GamePlayerOperation.DISCARD);
         operation.setPreviousTileGroup(boardTile.getTileGroup());
         operation.setBoardTile(boardTile);
-
         operationService.saveOperation(operation);
 
         // 捨牌後才將剛剛摸到的牌加入手牌
@@ -295,6 +318,7 @@ public class TileServiceImpl implements TileService {
         operation.setGamePlayerOperation(GamePlayerOperation.CALL_FOR_PONG);
         operation.setBoardTile(boardTile);
         operation.setPreviousTileGroup(boardTile.getTileGroup());
+        operationService.saveOperation(operation);
 
         ExposedTileGroup exposedTileGroup = createExposedTileGroup(playerTile, MeldType.PONG);
         playerTile.pongTile(exposedTileGroup, boardTile);
@@ -335,6 +359,7 @@ public class TileServiceImpl implements TileService {
         operation.setGamePlayerOperation(GamePlayerOperation.CALL_FOR_CHOW);
         operation.setBoardTile(boardTile);
         operation.setPreviousTileGroup(boardTile.getTileGroup());
+        operationService.saveOperation(operation);
 
         ExposedTileGroup exposedTileGroup = createExposedTileGroup(playerTile, MeldType.CHOW);
         playerTile.chowTile(exposedTileGroup, boardTile, chowCombination);
@@ -355,9 +380,57 @@ public class TileServiceImpl implements TileService {
         operation.setGamePlayerOperation(GamePlayerOperation.CALL_FOR_EXPOSED_KONG);
         operation.setBoardTile(boardTile);
         operation.setPreviousTileGroup(boardTile.getTileGroup());
+        operationService.saveOperation(operation);
 
         ExposedTileGroup exposedTileGroup = createExposedTileGroup(playerTile, MeldType.EXPOSED_KONG);
-        playerTile.exposePongTile(exposedTileGroup, boardTile);
+        playerTile.exposeKongTile(exposedTileGroup, boardTile);
+
+        saveExposedTileGroup(exposedTileGroup);
+    }
+
+    @Override
+    public void concealKongTile(PlayerTile playerTile, Operation operation, int combinationIndex) {
+
+        BoardTile lastDrawnBoardTile = playerTile.getDrawnTiles().getDrawnTile();
+
+        if (!playerTile.getHandTiles().canCallConcealedKong(lastDrawnBoardTile.getTile())) {
+            throw new WebAPIException(HttpStatus.BAD_REQUEST, "Player cannot call concealed kong");
+        }
+
+        List<Tile> concealedKongCombinations = playerTile.getHandTiles().getConcealedKongCombinations(lastDrawnBoardTile.getTile());
+
+        Tile concealedKongTile;
+
+        if (concealedKongCombinations.size() < 2) {
+            if (combinationIndex != 0) {
+                throw new WebAPIException(HttpStatus.BAD_REQUEST, "Invalid concealed kong combination index");
+            }
+            concealedKongTile = concealedKongCombinations.get(0);
+        } else {
+            if (combinationIndex < 1 || combinationIndex > concealedKongCombinations.size()) {
+                throw new WebAPIException(HttpStatus.BAD_REQUEST, "Invalid concealed kong combination index");
+            }
+            concealedKongTile = concealedKongCombinations.get(combinationIndex - 1);
+        }
+
+        BoardTile boardTile;
+
+        if (concealedKongTile != lastDrawnBoardTile.getTile()) { // 暗槓的四張牌都在手牌裡
+            boardTile = playerTile.getHandTiles().removeFirstBoardTileByTile(concealedKongTile);
+            // 要將剛摸到的牌先加入手牌中
+            playerTile.getHandTiles().addBoardTileToTileGroup(lastDrawnBoardTile);
+            boardTileRepository.save(boardTile);
+        } else { // 暗槓的其中一張是剛摸到的牌
+            boardTile = lastDrawnBoardTile;
+        }
+
+        operation.setGamePlayerOperation(GamePlayerOperation.CALL_FOR_CONCEALED_KONG);
+        operation.setBoardTile(boardTile);
+        operation.setPreviousTileGroup(playerTile.getHandTiles());
+        operationService.saveOperation(operation);
+
+        ExposedTileGroup exposedTileGroup = createExposedTileGroup(playerTile, MeldType.CONCEALED_KONG);
+        playerTile.concealKongTile(exposedTileGroup, boardTile);
 
         saveExposedTileGroup(exposedTileGroup);
     }

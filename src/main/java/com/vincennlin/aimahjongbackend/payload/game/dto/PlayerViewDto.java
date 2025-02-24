@@ -2,10 +2,7 @@ package com.vincennlin.aimahjongbackend.payload.game.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vincennlin.aimahjongbackend.payload.game.dto.tile.BoardTileDto;
-import com.vincennlin.aimahjongbackend.payload.game.dto.tile.PlayerTileDto;
-import com.vincennlin.aimahjongbackend.payload.game.dto.tile.TileDto;
-import com.vincennlin.aimahjongbackend.payload.game.dto.tile.WallTileGroupDto;
+import com.vincennlin.aimahjongbackend.payload.game.dto.tile.*;
 import com.vincennlin.aimahjongbackend.payload.game.operation.GamePlayerOperation;
 import com.vincennlin.aimahjongbackend.payload.game.status.GamePlayerStatus;
 import com.vincennlin.aimahjongbackend.payload.game.status.HandStatus;
@@ -67,6 +64,10 @@ public class PlayerViewDto {
     @JsonProperty(value = "chow_combinations")
     private List<List<TileDto>> chowCombinations;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(value = "concealed_kong_combinations")
+    private List<TileDto> concealedKongCombinations;
+
     @JsonProperty(value = "player_tile")
     private PlayerTileDto playerTile;
 
@@ -84,8 +85,11 @@ public class PlayerViewDto {
 
     public void hideTiles() {
         downwindPlayerTile.getHandTiles().hideTiles();
+        downwindPlayerTile.getExposedTileList().forEach(ExposedTileGroupDto::hideTiles);
         oppositePlayerTile.getHandTiles().hideTiles();
+        oppositePlayerTile.getExposedTileList().forEach(ExposedTileGroupDto::hideTiles);
         upwindPlayerTile.getHandTiles().hideTiles();
+        upwindPlayerTile.getExposedTileList().forEach(ExposedTileGroupDto::hideTiles);
         wallTiles.hideTiles();
     }
 }

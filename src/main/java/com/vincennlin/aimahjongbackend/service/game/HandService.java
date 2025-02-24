@@ -50,4 +50,6 @@ public interface HandService {
     PlayerViewDto chowTile(Long gameId, int combinationIndex);
 
     PlayerViewDto exposeKongTile(Long gameId);
+
+    PlayerViewDto concealKongTile(Long gameId, int combinationIndex);
 }

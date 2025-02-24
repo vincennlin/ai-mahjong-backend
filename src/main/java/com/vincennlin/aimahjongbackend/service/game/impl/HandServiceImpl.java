@@ -201,7 +201,7 @@ public class HandServiceImpl implements HandService {
             throw new ProcessException(HttpStatus.BAD_REQUEST, hand.getStatus(), "Hand is not in finished dealing state");
         }
 
-        tileService.drawTile(hand.getDealer().getPlayerTile(), hand.getWallTileGroup());
+        tileService.breakWall(hand.getDealer().getPlayerTile(), hand.getWallTileGroup());
 
         hand.setStatus(HandStatus.FINISHED_BREAKING_WALL);
 
@@ -218,14 +218,23 @@ public class HandServiceImpl implements HandService {
         }
 
         int[] foulHandCount = new int[DefaultGameConstants.DEFAULT_PLAYER_COUNT];
-        // 如果開門補到花，則 isFoulHand() 為 true，所以多補一張
-        foulHandCount[0] = hand.getDealer().getPlayerTile().getDrawnTiles().isFoulHand() ? 1 : 0;
+
+        if (hand.getDealer().getPlayerTile().getDrawnTiles().isFoulHand()) { // 開門補到花
+            foulHandCount[0] += DefaultGameConstants.DEFAULT_TILE_COUNT_PER_PLAYER - hand.getDealer().getPlayerTile().getHandTiles().getTiles().size();
+//            foulHandCount[0] += 1;
+        } else { // 開門不是花
+            if (hand.getDealer().getPlayerTile().getDrawnTiles().getDrawnTile() == null) { // 需要補花
+                foulHandCount[0] += DefaultGameConstants.DEFAULT_TILE_COUNT_PER_PLAYER + 1 - hand.getDealer().getPlayerTile().getHandTiles().getTiles().size();
+            } else { // 完全不需要補花
+
+            }
+        }
 
         GamePlayer currentPlayer = hand.getDealer();
 
         for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
             PlayerTile playerTile = currentPlayer.getPlayerTile();
-            foulHandCount[i] += playerTile.getHandTiles().getInitialFoulHandCount();
+            foulHandCount[i] += (DefaultGameConstants.DEFAULT_TILE_COUNT_PER_PLAYER) - playerTile.getHandTiles().getTiles().size();
             currentPlayer = currentPlayer.getDownwindPlayer();
         }
 
@@ -233,8 +242,8 @@ public class HandServiceImpl implements HandService {
             for (int i = 0; i < DefaultGameConstants.DEFAULT_PLAYER_COUNT; i++) {
                 if (foulHandCount[i] >= 1) {
                     PlayerTile playerTile = currentPlayer.getPlayerTile();
-                    tileService.initialFoulHand(playerTile, hand.getWallTileGroup(), foulHandCount[i], currentPlayer == hand.getDealer());
-                    foulHandCount[i] = playerTile.getHandTiles().getInitialFoulHandCount();
+                    int flowerCount = tileService.initialFoulHand(playerTile, hand.getWallTileGroup(), foulHandCount[i], currentPlayer == hand.getDealer());
+                    foulHandCount[i] = flowerCount;
                 }
                 currentPlayer = currentPlayer.getDownwindPlayer();
             }
@@ -406,6 +415,31 @@ public class HandServiceImpl implements HandService {
         }
 
         tileService.exposeKongTile(gamePlayer.getPlayerTile(), hand.getActiveGamePlayer().getPlayerTile(), operationService.createOperation(hand, gamePlayer));
+
+        BoardTile drawnTile = tileService.foulHand(gamePlayer.getPlayerTile(), hand.getWallTileGroup());
+
+        while (drawnTile.isFlower()) {
+            drawnTile = tileService.foulHand(gamePlayer.getPlayerTile(), hand.getWallTileGroup());
+        }
+
+        GamePlayer savedGamePlayer = gamePlayerService.setGamePlayerStatus(gamePlayer, GamePlayerStatus.THINKING_FOR_DISCARD);
+
+        hand.setActiveGamePlayer(savedGamePlayer);
+        Hand savedHand = setHandStatus(hand, HandStatus.WAITING_FOR_DISCARD);
+
+        return getPlayerViewDtoByHandAndGamePlayer(savedHand, savedGamePlayer);
+    }
+
+    @Transactional
+    @Override
+    public PlayerViewDto concealKongTile(Long gameId, int combinationIndex) {
+
+        Hand hand = getCurrentHandEntityByGameId(gameId);
+        GamePlayer gamePlayer = getGamePlayerByHandAndCurrentUserId(hand);
+
+        checkIsThinkingForDiscard(hand, gamePlayer);
+
+        tileService.concealKongTile(gamePlayer.getPlayerTile(), operationService.createOperation(hand, gamePlayer), combinationIndex);
 
         BoardTile drawnTile = tileService.foulHand(gamePlayer.getPlayerTile(), hand.getWallTileGroup());
 

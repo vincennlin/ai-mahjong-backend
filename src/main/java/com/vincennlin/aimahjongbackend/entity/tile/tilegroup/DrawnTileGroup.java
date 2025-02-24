@@ -26,7 +26,7 @@ public class DrawnTileGroup extends TileGroup implements PlayerTileGroup {
     @JoinColumn(name = "player_tile_id", referencedColumnName = "id")
     private PlayerTile playerTile;
 
-    @Transient
+    @Column(name = "is_foul_hand")
     private boolean isFoulHand;
 
     public BoardTile getDrawnTile() {
